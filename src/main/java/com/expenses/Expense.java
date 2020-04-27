@@ -1,8 +1,11 @@
 package com.expenses;
 
+
 import java.text.DecimalFormat;
+import java.text.FieldPosition;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+
 
 public class Expense {
     private double amount;
@@ -69,11 +72,19 @@ public class Expense {
         if (place.isBlank() ){
             throw new InvalidExpenseException("2");
         }
-        DecimalFormat df=new java.text.DecimalFormat("0.00");
-       // if(false){
-       //     throw new InvalidExpenseException("Money requires to be written in format 0.00");
-       // }
+
+
+        if(!checkPrecisionOfDouble(amount)){
+            throw new InvalidExpenseException("Money requires to be written in format 0.00");
+        }
 
         return new Expense(amount,date,place,category);
+    }
+
+    static boolean checkPrecisionOfDouble (Double attribute) {
+        String s = String.valueOf(attribute);
+        String[] split = s.split("\\.");
+
+        return split[1].length() == 2 || split[1].length() == 1 ;
     }
 }

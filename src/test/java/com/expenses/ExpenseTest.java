@@ -44,11 +44,37 @@ class ExpenseTest {
 
     @ParameterizedTest
     @ValueSource(doubles = {3.001, 3.332, 3.0100009, 3.020, 3})
-    void shouldNotAcceptInvelidFormatOfAmounwt( double amount) {
+    void shouldNotAcceptInvalidFormatOfAmount( double amount) {
     Executable create = () -> Expense.from(amount,LocalDate.now(),
             "loc","Cat");
 
     assertThrows(InvalidExpenseException.class, create);
+    }
+
+    @Test
+    void shouldAcceptProperFormatOfAmount() throws InvalidExpenseException {
+        double amount1 = 2.3;
+        double amount2 = 32.333;
+        double amount3 = 2.32;
+
+        LocalDate requestedDate = LocalDate.now().minusDays(5);
+        Expense expense1 = Expense.from(2.3,requestedDate,"Loc","Cat");
+        //Expense expense2 = Expense.from(32.333,requestedDate,"Loc","Cat");
+        Expense expense3 = Expense.from(2.32,requestedDate,"Loc","Cat");
+
+        Executable executable = () -> Expense
+                .from(32.333, requestedDate, "Location", "Category");
+
+        ExpenseService expenseService = new ExpenseService();
+        expenseService.addExpense(expense1);
+       // expenseService.addExpense(expense2);
+        expenseService.addExpense(expense3);
+
+        Set<Expense> foundExpences = expenseService.findExpensesByDate(requestedDate);
+        assertThrows(InvalidExpenseException.class,  executable);
+        assertTrue(foundExpences.contains(expense1));
+        assertTrue(foundExpences.contains(expense3));
+
     }
 
     @Test
