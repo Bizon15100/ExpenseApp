@@ -1,8 +1,6 @@
 package com.expenses;
 
 
-import java.text.DecimalFormat;
-import java.text.FieldPosition;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -13,8 +11,8 @@ public class Expense {
     private String place;
     private String category;
 
-    private Expense(double amount, LocalDate date,
-                        String place, String category) {
+    public Expense(double amount, LocalDate date,
+                   String place, String category) {
         this.amount = amount;
         this.date = date;
         this.place = place;
@@ -53,6 +51,7 @@ public class Expense {
         this.category = categoty;
     }
 
+
     @Override
     public String toString() {
         DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy");
@@ -67,12 +66,11 @@ public class Expense {
             throw new InvalidExpenseException("Amount should be grater than 0");
         }
         if (date == null || date.isAfter(LocalDate.now())) {
-                throw new InvalidExpenseException("1");
+                throw new InvalidExpenseException("You can't set a future date of expense");
         }
         if (place.isBlank() ){
-            throw new InvalidExpenseException("2");
+            throw new InvalidExpenseException("You have to write a place of expense");
         }
-
 
         if(!checkPrecisionOfDouble(amount)){
             throw new InvalidExpenseException("Money requires to be written in format 0.00");
@@ -85,6 +83,6 @@ public class Expense {
         String s = String.valueOf(attribute);
         String[] split = s.split("\\.");
 
-        return split[1].length() == 2 || split[1].length() == 1 ;
+        return split[1].length() == 2 || split[1].length() == 1 || split[1].length() == 0;
     }
 }

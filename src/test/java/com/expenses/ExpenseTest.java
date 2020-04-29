@@ -7,6 +7,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -14,7 +15,52 @@ import static org.junit.jupiter.api.Assertions.*;
 class ExpenseTest {
 
     @Test
-    void shouldNotAllowExpensesFuture(){
+    void shouldReturnDatesInRangeOfDates() throws InvalidExpenseException{
+        LocalDate now = LocalDate.now();
+        Expense expense1 = Expense.from(100,now,"Loc","Cat");
+        Expense expense2 = Expense.from(100,now.minusDays(10),"Loc","Cat");
+        Expense expense3 = Expense.from(100,now.minusMonths(2),"Loc","Cat");
+        Expense expense4 = Expense.from(100,now.minusDays(25),"Loc","Cat");
+        Expense expense5 = Expense.from(100,now.minusWeeks(6),"Loc","Cat");
+
+        ExpenseService expenseService = new ExpenseService();
+        expenseService.addExpense(expense1);
+        expenseService.addExpense(expense2);
+        expenseService.addExpense(expense3);
+        expenseService.addExpense(expense4);
+        expenseService.addExpense(expense5);
+
+        Set<Expense> expensesInRange = expenseService.findExpensesInRange(now.minusMonths(1), now);
+
+        assertTrue(expensesInRange.contains(expense2));
+        assertFalse(expensesInRange.contains(expense3));
+    }
+
+    @Test
+    void shouldReturnNTheBiggestAmounts() throws InvalidExpenseException{
+        Expense expense1 = Expense.from(3.1, LocalDate.now(), "House", "Cat");
+        Expense expense2 = Expense.from(3.33, LocalDate.now(), "House", "Cat");
+        Expense expense3 = Expense.from(31.01, LocalDate.now(), "House", "Cat");
+        Expense expense4 = Expense.from(133, LocalDate.now(), "House", "Cat");
+        Expense expense5 = Expense.from(23.2, LocalDate.now(), "House", "Cat");
+
+        ExpenseService expenseService = new ExpenseService();
+        expenseService.addExpense(expense1);
+        expenseService.addExpense(expense2);
+        expenseService.addExpense(expense3);
+        expenseService.addExpense(expense4);
+        expenseService.addExpense(expense5);
+
+        List<Expense> nLargestExpenses = expenseService.getNLargestExpenses(2);
+
+        assertTrue(nLargestExpenses.contains(expense4));
+        assertTrue(nLargestExpenses.contains(expense3));
+        assertFalse(nLargestExpenses.contains(expense2));
+
+    }
+
+    @Test
+    void shouldNotAllowFutureExpenses(){
         LocalDate dateInFuture = LocalDate.of(2020, Month.APRIL,30);
 
         Executable createExpenseInFuture = () -> Expense
@@ -33,8 +79,8 @@ class ExpenseTest {
         assertThrows(InvalidExpenseException.class,createExpenseInFuture);
     }
     @Test
-    void shouldNotAcceptInvelidFormatOfAmount(){
-        LocalDate date = LocalDate.of(2019,Month.JANUARY,11);
+    void shouldNotAcceptInvelidFormatOfDate(){
+        LocalDate date = LocalDate.of(2022,Month.JANUARY,11);
 
         Executable createExpenseInFuture = () -> Expense
                 .from(100.1, date, "Location", "Category");
@@ -43,8 +89,8 @@ class ExpenseTest {
     }
 
     @ParameterizedTest
-    @ValueSource(doubles = {3.001, 3.332, 3.0100009, 3.020, 3})
-    void shouldNotAcceptInvalidFormatOfAmount( double amount) {
+    @ValueSource(doubles = {3.001, 3.332, 3.0100009, 1000.233})
+    void shouldAcceptInvalidFormatOfAmount( double amount) {
     Executable create = () -> Expense.from(amount,LocalDate.now(),
             "loc","Cat");
 
@@ -67,7 +113,7 @@ class ExpenseTest {
 
         ExpenseService expenseService = new ExpenseService();
         expenseService.addExpense(expense1);
-       // expenseService.addExpense(expense2);
+
         expenseService.addExpense(expense3);
 
         Set<Expense> foundExpences = expenseService.findExpensesByDate(requestedDate);
