@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ExpenseService implements Comparator<Double> {
+public class ExpenseService {
     private Set<Expense> expenses = new HashSet<>();
 
     public void addExpense(Expense expense) {
@@ -95,8 +95,5 @@ public class ExpenseService implements Comparator<Double> {
         return message.toString();
     }
 
-    @Override
-    public int compare(Double o1, Double o2) {
-        return o1.compareTo(o2);
-    }
+
 }
