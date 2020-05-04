@@ -6,7 +6,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDate;
-import java.time.Month;
 import java.util.List;
 import java.util.Set;
 
@@ -59,15 +58,6 @@ class ExpenseTest {
 
     }
 
-    @Test
-    void shouldNotAllowFutureExpenses(){
-        LocalDate dateInFuture = LocalDate.of(2020, Month.MAY,30);
-
-        Executable createExpenseInFuture = () -> Expense
-                .from(100, dateInFuture, "Location", "Category");
-
-        assertThrows(InvalidExpenseException.class,createExpenseInFuture);
-    }
 
     @Test
     void shouldNotAllowNull(){
@@ -139,7 +129,7 @@ class ExpenseTest {
         financesService.addExpense(expense2);
         financesService.addExpense(expense3);
 
-        Double average = financesService.averageOfAmountsInRangeOfTime(LocalDate.now().minusWeeks(4), LocalDate.now());
+        Double average = financesService.averageOfExpensesInRangeOfTime(LocalDate.now().minusWeeks(4), LocalDate.now());
         Double result = 20.00d;
 
         assertEquals(average, result);
@@ -164,6 +154,24 @@ class ExpenseTest {
         assertTrue(categorizedExpenses.contains(expense3));
         assertTrue(categorizedExpenses.contains(expense4));
         assertFalse(categorizedExpenses.contains(expense1));
+    }
+
+    @Test
+    void shouldReturnTheBiggestExpenseInGivenCategory() throws InvalidExpenseException {
+        Expense expense1 = Expense.from(3.22, LocalDate.now(),"Market","Relax");
+        Expense expense2 = Expense.from(3.22, LocalDate.now(),"Market","Pizza");
+        Expense expense3 = Expense.from(32.22, LocalDate.now(),"Market","Pizza");
+        Expense expense4 = Expense.from(55, LocalDate.now(),"Market","Pizza");
+
+        ExpenseService financesService = new ExpenseService();
+        financesService.addExpense(expense1);
+        financesService.addExpense(expense2);
+        financesService.addExpense(expense3);
+        financesService.addExpense(expense4);
+
+        double biggestExpense = financesService.theBiggestExpenseInGivenCategory("Pizza");
+
+        assertEquals(biggestExpense,55);
 
     }
 }
