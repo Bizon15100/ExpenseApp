@@ -72,15 +72,24 @@ public class ExpenseService {
 
     public double theBiggestExpenseInGivenCategory(String category) {
         Set<Expense> expensesInCategory = expensesInOneCategory(category);
-        double result = 0d;
-        new ArrayList<>(expensesInCategory).sort(Comparator.comparingDouble(Expense::getAmount));
+        double result = 0;
 
-        for (Expense expense : expensesInCategory) {
-            List<Expense> expenseList = new ArrayList<>(expensesInCategory);
-            result = expenseList.get(expenseList.size()-1).getAmount();
-        }
+        List<Expense> expenseList = expensesInCategory.stream().collect(Collectors.toList());
+        expenseList.sort(Comparator.comparingDouble(Expense::getAmount));
+
+        result = expenseList.get(expenseList.size()-1).getAmount();
 
         return result;
+    }
+    public Map<String,Double> mapOfCategoryAndExpenses(){
+        Map <String,Double> map= new HashMap<>();
+
+        for (Expense expense:expenses) {
+            if (!map.containsKey(expense.getCategory())){
+                map.put(expense.getCategory(),theBiggestExpenseInGivenCategory(expense.getCategory()));
+            }
+        }
+        return map;
     }
 
 
