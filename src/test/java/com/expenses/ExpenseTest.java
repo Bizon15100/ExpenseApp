@@ -61,7 +61,7 @@ class ExpenseTest {
 
     @Test
     void shouldNotAllowFutureExpenses(){
-        LocalDate dateInFuture = LocalDate.of(2020, Month.APRIL,30);
+        LocalDate dateInFuture = LocalDate.of(2020, Month.MAY,30);
 
         Executable createExpenseInFuture = () -> Expense
                 .from(100, dateInFuture, "Location", "Category");
@@ -79,8 +79,8 @@ class ExpenseTest {
         assertThrows(InvalidExpenseException.class,createExpenseInFuture);
     }
     @Test
-    void shouldNotAcceptInvelidFormatOfDate(){
-        LocalDate date = LocalDate.of(2022,Month.JANUARY,11);
+    void shouldThrowErrorBecauseOfFutureDateOfExpense(){
+        LocalDate date = LocalDate.now().plusYears(2);
 
         Executable createExpenseInFuture = () -> Expense
                 .from(100.1, date, "Location", "Category");
@@ -89,39 +89,25 @@ class ExpenseTest {
     }
 
     @ParameterizedTest
-    @ValueSource(doubles = {3.001, 3.332, 3.0100009, 1000.233})
-    void shouldAcceptInvalidFormatOfAmount( double amount) {
+    @ValueSource(doubles = {132.001, 31.332, 3.0100009, 1000.233})
+    void shouldThrowErrorBecauseOfInvalidFormatOfAmount( double amount) {
     Executable create = () -> Expense.from(amount,LocalDate.now(),
             "loc","Cat");
 
     assertThrows(InvalidExpenseException.class, create);
     }
 
-    @Test
-    void shouldAcceptProperFormatOfAmount() throws InvalidExpenseException {
-        double amount1 = 2.3;
-        double amount2 = 32.333;
-        double amount3 = 2.32;
+    @ParameterizedTest
+    @ValueSource(doubles = {132.00, 31.32, 3.0, 100})
+    void shouldAcceptProperFormatOfAmount( double amount) throws InvalidExpenseException {
 
-        LocalDate requestedDate = LocalDate.now().minusDays(5);
-        Expense expense1 = Expense.from(2.3,requestedDate,"Loc","Cat");
-        //Expense expense2 = Expense.from(32.333,requestedDate,"Loc","Cat");
-        Expense expense3 = Expense.from(2.32,requestedDate,"Loc","Cat");
+        Expense expense = Expense.from(amount,LocalDate.now(),"Shop","Food");
 
-        Executable executable = () -> Expense
-                .from(32.333, requestedDate, "Location", "Category");
+         ExpenseService expenseService = new ExpenseService();
+         expenseService.addExpense(expense);
 
-        ExpenseService expenseService = new ExpenseService();
-        expenseService.addExpense(expense1);
-
-        expenseService.addExpense(expense3);
-
-        Set<Expense> foundExpences = expenseService.findExpensesByDate(requestedDate);
-        assertThrows(InvalidExpenseException.class,  executable);
-        assertTrue(foundExpences.contains(expense1));
-        assertTrue(foundExpences.contains(expense3));
-
-    }
+         assertTrue(expenseService.getExpenseSet().contains(expense));
+        }
 
     @Test
     void shouldReturnExpensesWIthRequestedDate() throws InvalidExpenseException {
@@ -135,12 +121,49 @@ class ExpenseTest {
         expenseService.addExpense(expense2);
         expenseService.addExpense(expense3);
 
-        Set<Expense> foundExpences = expenseService.findExpensesByDate(requestedDate);
+        Set<Expense> foundExpenses = expenseService.findExpensesByDate(requestedDate);
 
-        assertEquals(2,foundExpences.size());
-        assertTrue(foundExpences.contains(expense1));
-        assertTrue(foundExpences.contains(expense3));
+        assertEquals(2,foundExpenses.size());
+        assertTrue(foundExpenses.contains(expense1));
+        assertTrue(foundExpenses.contains(expense3));
 
     }
+    @Test
+    void shouldReturnAverageOfAmounts () throws InvalidExpenseException{
+        Expense expense1 = Expense.from(10, LocalDate.now().minusWeeks(3),"Pizza","Relax");
+        Expense expense2 = Expense.from(20, LocalDate.now().minusWeeks(2),"Pizza","Pizza");
+        Expense expense3 = Expense.from(30, LocalDate.now().minusWeeks(1),"Pizza","Pizza");
 
+        ExpenseService financesService = new ExpenseService();
+        financesService.addExpense(expense1);
+        financesService.addExpense(expense2);
+        financesService.addExpense(expense3);
+
+        Double average = financesService.averageOfAmountsInRangeOfTime(LocalDate.now().minusWeeks(4), LocalDate.now());
+        Double result = 20.00d;
+
+        assertEquals(average, result);
+    }
+
+    @Test
+    void shouldReturnExpensesInOneCategory() throws InvalidExpenseException{
+        Expense expense1 = Expense.from(3.22, LocalDate.now(),"Market","Relax");
+        Expense expense2 = Expense.from(3.22, LocalDate.now(),"Market","Pizza");
+        Expense expense3 = Expense.from(32.22, LocalDate.now(),"Market","Pizza");
+        Expense expense4 = Expense.from(55, LocalDate.now(),"Market","Pizza");
+
+        ExpenseService financesService = new ExpenseService();
+        financesService.addExpense(expense1);
+        financesService.addExpense(expense2);
+        financesService.addExpense(expense3);
+        financesService.addExpense(expense4);
+
+        Set<Expense> categorizedExpenses = financesService.expensesInOneCategory("Pizza");
+
+        assertTrue(categorizedExpenses.contains(expense2));
+        assertTrue(categorizedExpenses.contains(expense3));
+        assertTrue(categorizedExpenses.contains(expense4));
+        assertFalse(categorizedExpenses.contains(expense1));
+
+    }
 }

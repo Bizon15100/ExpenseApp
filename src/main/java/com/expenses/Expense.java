@@ -1,6 +1,7 @@
 package com.expenses;
 
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -18,37 +19,20 @@ public class Expense {
         this.place = place;
         this.category = category;
     }
-
     public double getAmount() {
         return amount;
-    }
-
-    public void setAmount(double amount) {
-        this.amount = amount;
     }
 
     public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
     public String getPlace() {
         return place;
     }
 
-    public void setPlace(String place) {
-        this.place = place;
-    }
-
     public String getCategory() {
         return category;
-    }
-
-    public void setCategory(String categoty) {
-        this.category = categoty;
     }
 
 
@@ -63,13 +47,13 @@ public class Expense {
     public static Expense from(double amount, LocalDate date,
                                String place, String category) throws InvalidExpenseException{
         if (amount<0){
-            throw new InvalidExpenseException("Amount should be grater than 0");
+            throw new InvalidExpenseException("Amount should be grater than 0.");
         }
         if (date == null || date.isAfter(LocalDate.now())) {
-                throw new InvalidExpenseException("You can't set a future date of expense");
+                throw new InvalidExpenseException("You have to write a past date.");
         }
         if (place.isBlank() ){
-            throw new InvalidExpenseException("You have to write a place of expense");
+            throw new InvalidExpenseException("You have to write a place of expense.");
         }
 
         if(!checkPrecisionOfDouble(amount)){
@@ -79,10 +63,18 @@ public class Expense {
         return new Expense(amount,date,place,category);
     }
 
-    static boolean checkPrecisionOfDouble (Double attribute) {
+    static boolean checkPrecisionOfDouble (double attribute) {
         String s = String.valueOf(attribute);
         String[] split = s.split("\\.");
+        if (split.length <=2) {
+            return split[1].length() == 2 | split[1].length() == 1 | split[1].length() == 0;
+        } else return false;
 
-        return split[1].length() == 2 || split[1].length() == 1 || split[1].length() == 0;
+    }
+    static boolean checkPrecisionOfDouble2 (BigDecimal attribute) {
+        int precision = attribute.precision();
+        return precision>=0 && precision<=2;
+        // wywala mi błąd w testach gdy używam w metodzie from...
+        // nie wiem jak ją poprawnie zaimplementować ...
     }
 }
