@@ -1,5 +1,9 @@
 package com.expenses;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -61,12 +65,12 @@ public class ExpenseService {
 
     public Double averageOfExpensesInRangeOfTime(LocalDate from, LocalDate to) {
         Set<Expense> expensesInRange = findExpensesInRange(from, to);
-        double average = 0d;
+        double sum = 0d;
         for (Expense expense : expensesInRange) {
-            average = average + expense.getAmount();
+            sum = sum + expense.getAmount();
         }
         if (expensesInRange.size() != 0 | !expensesInRange.isEmpty()) {
-            return average / expensesInRange.size() + average % expensesInRange.size();
+            return sum / expensesInRange.size() + sum % expensesInRange.size();
         } else return 0d;
     }
 
@@ -77,21 +81,45 @@ public class ExpenseService {
         List<Expense> expenseList = expensesInCategory.stream().collect(Collectors.toList());
         expenseList.sort(Comparator.comparingDouble(Expense::getAmount));
 
-        result = expenseList.get(expenseList.size()-1).getAmount();
+        result = expenseList.get(expenseList.size() - 1).getAmount();
 
         return result;
     }
-    public Map<String,Double> mapOfCategoryAndExpenses(){
-        Map <String,Double> map= new HashMap<>();
 
-        for (Expense expense:expenses) {
-            if (!map.containsKey(expense.getCategory())){
-                map.put(expense.getCategory(),theBiggestExpenseInGivenCategory(expense.getCategory()));
+    public Map<String, Double> mapOfCategoryAndLargestExpense() {
+        Map<String, Double> map = new HashMap<>();
+        for (Expense expense : expenses) {
+            if (!map.containsKey(expense.getCategory())) {
+                map.put(expense.getCategory(), theBiggestExpenseInGivenCategory(expense.getCategory()));
             }
         }
         return map;
     }
 
+    public double averageOfExpensesInCategory(String category) {
+        Set<Expense> expensesInOneCategory = expensesInOneCategory(category);
+        double sum = 0;
+        double average;
+        for (Expense expense : expensesInOneCategory) {
+            sum = sum + expense.getAmount();
+        }
+        average = sum /expensesInOneCategory.size();
+        return average;
+    }
+
+    public Map<String, Double> mapOfCategoryAndAverageOfExpenses() {
+        Map<String, Double> map = new HashMap<>();
+
+        for (Expense expense : expenses) {
+            if (!map.containsKey(expense.getCategory())) {
+                double value = averageOfExpensesInCategory(expense.getCategory());
+                BigDecimal bd = new BigDecimal(value).setScale(2, RoundingMode.HALF_UP);
+                double newInput = bd.doubleValue();
+                map.put(expense.getCategory(), newInput);
+            }
+        }
+        return map;
+    }
 
     @Override
     public String toString() {

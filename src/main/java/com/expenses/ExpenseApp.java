@@ -1,7 +1,10 @@
 package com.expenses;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.Set;
 
 public class ExpenseApp {
     public static void main(String[] args) throws InvalidExpenseException {
@@ -18,7 +21,5 @@ public class ExpenseApp {
         financesService.addExpense(expense4);
         financesService.addExpense(expense5);
 
-        Map<String, Double> map = financesService.mapOfCategoryAndExpenses();
-        System.out.println(map.get("Pizza"));
     }
 }
