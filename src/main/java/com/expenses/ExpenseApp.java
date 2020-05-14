@@ -1,6 +1,6 @@
 package com.expenses;
 
-import java.math.BigDecimal;
+
 import java.time.LocalDate;
 
 import static com.expenses.Expense.*;
@@ -41,10 +41,6 @@ public class ExpenseApp {
                 .place("Market")
                 .category("Pizza")
                 .build();
-    //    Expense expense2 = from(3.22, LocalDate.now(),"Market","Pizza");
-    //    Expense expense3 = from(32.22, LocalDate.now(),"Market","Pizza");
-    //    Expense expense4 = from(55, LocalDate.now(),"Market","Pizza");
-    //    Expense expense5 = from(30.2, LocalDate.now(),"Market","Relax");
 
         ExpenseService financesService = new ExpenseService();
 
