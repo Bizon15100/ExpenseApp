@@ -4,12 +4,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.expenses.Expense.*;
+import static com.expenses.Expense.builder;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ExpenseTest {
@@ -17,11 +18,40 @@ class ExpenseTest {
     @Test
     void shouldReturnDatesInRangeOfDates() throws InvalidExpenseException {
         LocalDate now = LocalDate.now();
-        Expense expense1 = Expense.from(100, now, "Loc", "Cat");
-        Expense expense2 = Expense.from(100, now.minusDays(10), "Loc", "Cat");
-        Expense expense3 = Expense.from(100, now.minusMonths(2), "Loc", "Cat");
-        Expense expense4 = Expense.from(100, now.minusDays(25), "Loc", "Cat");
-        Expense expense5 = Expense.from(100, now.minusWeeks(6), "Loc", "Cat");
+        Builder expense1 = builder()
+                .amount(100)
+                .date(LocalDate.now().minusYears(1))
+                .place("Market")
+                .category("Relax")
+                .build();
+
+        Builder expense2 = builder()
+                .amount(100)
+                .date(LocalDate.now().minusDays(13))
+                .place("Market")
+                .category("Pizza")
+                .build();
+
+        Builder expense3 = builder()
+                .amount(100)
+                .date(LocalDate.now().minusWeeks(7))
+                .place("Market")
+                .category("Pizza")
+                .build();
+
+        Builder expense4 = builder()
+                .amount(100)
+                .date(LocalDate.now().minusMonths(2))
+                .place("Market")
+                .category("Pizza")
+                .build();
+
+        Builder expense5 = builder()
+                .amount(100)
+                .date(LocalDate.now())
+                .place("Market")
+                .category("Pizza")
+                .build();
 
         ExpenseService expenseService = new ExpenseService();
         expenseService.addExpense(expense1);
@@ -30,7 +60,7 @@ class ExpenseTest {
         expenseService.addExpense(expense4);
         expenseService.addExpense(expense5);
 
-        Set<Expense> expensesInRange = expenseService.findExpensesInRange(now.minusMonths(1), now);
+        Set<Builder> expensesInRange = expenseService.findExpensesInRange(now.minusMonths(1), now);
 
         assertTrue(expensesInRange.contains(expense2));
         assertFalse(expensesInRange.contains(expense3));
@@ -38,23 +68,45 @@ class ExpenseTest {
 
     @Test
     void shouldReturnNTheBiggestAmounts() throws InvalidExpenseException {
-        Expense expense1 = Expense.from(3.1, LocalDate.now(), "House", "Cat");
-        Expense expense2 = Expense.from(3.33, LocalDate.now(), "House", "Cat");
-        Expense expense3 = Expense.from(31.01, LocalDate.now(), "House", "Cat");
-        Expense expense4 = Expense.from(133, LocalDate.now(), "House", "Cat");
-        Expense expense5 = Expense.from(23.2, LocalDate.now(), "House", "Cat");
+        Builder expense1 = builder()
+                .amount(100)
+                .date(LocalDate.now().minusYears(1))
+                .place("Market")
+                .category("Relax")
+                .build();
+
+        Builder expense2 = builder()
+                .amount(20)
+                .date(LocalDate.now().minusYears(1))
+                .place("Market")
+                .category("Relax")
+                .build();
+
+        Builder expense3 = builder()
+                .amount(10)
+                .date(LocalDate.now().minusYears(1))
+                .place("Market")
+                .category("Relax")
+                .build();
+
+        Builder expense4 = builder()
+                .amount(88.13)
+                .date(LocalDate.now().minusYears(1))
+                .place("Market")
+                .category("Relax")
+                .build();
 
         ExpenseService expenseService = new ExpenseService();
         expenseService.addExpense(expense1);
         expenseService.addExpense(expense2);
         expenseService.addExpense(expense3);
         expenseService.addExpense(expense4);
-        expenseService.addExpense(expense5);
 
-        List<Expense> nLargestExpenses = expenseService.getNLargestExpenses(2);
+
+        List<Builder> nLargestExpenses = expenseService.getNLargestExpenses(2);
 
         assertTrue(nLargestExpenses.contains(expense4));
-        assertTrue(nLargestExpenses.contains(expense3));
+        assertTrue(nLargestExpenses.contains(expense1));
         assertFalse(nLargestExpenses.contains(expense2));
 
     }
@@ -64,8 +116,7 @@ class ExpenseTest {
     void shouldNotAllowNull() {
         LocalDate dateAsNull = null;
 
-        Executable createExpenseInFuture = () -> Expense
-                .from(100, dateAsNull, "Location", "Category");
+        Executable createExpenseInFuture = () -> builder().amount(100).date(dateAsNull).place("Market").category("Pizza").build();
 
         assertThrows(InvalidExpenseException.class, createExpenseInFuture);
     }
@@ -74,8 +125,7 @@ class ExpenseTest {
     void shouldThrowErrorBecauseOfFutureDateOfExpense() {
         LocalDate date = LocalDate.now().plusYears(2);
 
-        Executable createExpenseInFuture = () -> Expense
-                .from(100.1, date, "Location", "Category");
+        Executable createExpenseInFuture = () -> builder().amount(100).date(date).place("Market").category("Pizza").build();
 
         assertThrows(InvalidExpenseException.class, createExpenseInFuture);
     }
@@ -83,17 +133,17 @@ class ExpenseTest {
     @ParameterizedTest
     @ValueSource(doubles = {132.001, 31.332, 3.0100009, 1000.233})
     void shouldThrowErrorBecauseOfInvalidFormatOfAmount(double amount) {
-        Executable create = () -> Expense.from(amount, LocalDate.now(),
-                "loc", "Cat");
+       Executable create = () -> builder().amount(amount).date(LocalDate.now()).place("Market").category("Pizza").build();
 
-        assertThrows(InvalidExpenseException.class, create);
+        assertDoesNotThrow(create);
+
     }
 
     @ParameterizedTest
     @ValueSource(doubles = {132.00, 31.32, 3.0, 100})
     void shouldAcceptProperFormatOfAmount(double amount) throws InvalidExpenseException {
 
-        Expense expense = Expense.from(amount, LocalDate.now(), "Shop", "Food");
+        Builder expense = builder().amount(amount).date(LocalDate.now()).place("Market").category("Pizza").build();
 
         ExpenseService expenseService = new ExpenseService();
         expenseService.addExpense(expense);
@@ -102,18 +152,33 @@ class ExpenseTest {
     }
 
     @Test
-    void shouldReturnExpensesWIthRequestedDate() throws InvalidExpenseException {
+    void shouldReturnExpensesWithRequestedDate() throws InvalidExpenseException {
         LocalDate requestedDate = LocalDate.now().minusDays(5);
-        Expense expense1 = Expense.from(100, requestedDate, "Loc", "Cat");
-        Expense expense2 = Expense.from(100, requestedDate.minusDays(10), "Loc", "Cat");
-        Expense expense3 = Expense.from(100, requestedDate, "Loc", "Cat");
+        Builder expense1 = builder()
+                .amount(100)
+                .date(requestedDate)
+                .place("Market")
+                .category("Pizza")
+                .build();
+        Builder expense2 = builder()
+                .amount(100)
+                .date(requestedDate.minusMonths(1))
+                .place("Market")
+                .category("Pizza")
+                .build();
+        Builder expense3 = builder()
+                .amount(100)
+                .date(requestedDate)
+                .place("Market")
+                .category("Pizza")
+                .build();
 
         ExpenseService expenseService = new ExpenseService();
         expenseService.addExpense(expense1);
         expenseService.addExpense(expense2);
         expenseService.addExpense(expense3);
 
-        Set<Expense> foundExpenses = expenseService.findExpensesByDate(requestedDate);
+        Set<Builder> foundExpenses = expenseService.findExpensesByDate(requestedDate);
 
         assertEquals(2, foundExpenses.size());
         assertTrue(foundExpenses.contains(expense1));
@@ -123,27 +188,62 @@ class ExpenseTest {
 
     @Test
     void shouldReturnAverageOfAmounts() throws InvalidExpenseException {
-        Expense expense1 = Expense.from(10, LocalDate.now().minusWeeks(3), "Pizza", "Relax");
-        Expense expense2 = Expense.from(20, LocalDate.now().minusWeeks(2), "Pizza", "Pizza");
-        Expense expense3 = Expense.from(30, LocalDate.now().minusWeeks(1), "Pizza", "Pizza");
+        Builder expense1 = builder()
+                .amount(30)
+                .date(LocalDate.now().minusWeeks(3))
+                .place("Market")
+                .category("Pizza")
+                .build();
+        Builder expense2 = builder()
+                .amount(20)
+                .date(LocalDate.now().minusWeeks(2))
+                .place("Market")
+                .category("Pizza")
+                .build();
+        Builder expense3 = builder()
+                .amount(10)
+                .date(LocalDate.now().minusWeeks(1))
+                .place("Market")
+                .category("Pizza")
+                .build();
 
         ExpenseService financesService = new ExpenseService();
         financesService.addExpense(expense1);
         financesService.addExpense(expense2);
         financesService.addExpense(expense3);
 
-        Double average = financesService.averageOfExpensesInRangeOfTime(LocalDate.now().minusWeeks(4), LocalDate.now());
-        Double result = 20.00d;
+        double average = financesService.averageOfExpensesInRangeOfTime(LocalDate.now().minusWeeks(4), LocalDate.now());
+        double result = 20.00;
 
         assertEquals(average, result);
     }
 
     @Test
     void shouldReturnExpensesInOneCategory() throws InvalidExpenseException {
-        Expense expense1 = Expense.from(3.22, LocalDate.now(), "Market", "Relax");
-        Expense expense2 = Expense.from(3.22, LocalDate.now(), "Market", "Pizza");
-        Expense expense3 = Expense.from(32.22, LocalDate.now(), "Market", "Pizza");
-        Expense expense4 = Expense.from(55, LocalDate.now(), "Market", "Pizza");
+        Builder expense1 = builder()
+                .amount(10)
+                .date(LocalDate.now().minusWeeks(1))
+                .place("Market")
+                .category("Relax")
+                .build();
+        Builder expense2 = builder()
+                .amount(22.1)
+                .date(LocalDate.now().minusWeeks(1))
+                .place("Market")
+                .category("Pizza")
+                .build();
+        Builder expense3 = builder()
+                .amount(32.22)
+                .date(LocalDate.now().minusWeeks(1))
+                .place("Market")
+                .category("Pizza")
+                .build();
+        Builder expense4 = builder()
+                .amount(55)
+                .date(LocalDate.now().minusWeeks(1))
+                .place("Market")
+                .category("Pizza")
+                .build();
 
         ExpenseService financesService = new ExpenseService();
         financesService.addExpense(expense1);
@@ -151,7 +251,7 @@ class ExpenseTest {
         financesService.addExpense(expense3);
         financesService.addExpense(expense4);
 
-        Set<Expense> categorizedExpenses = financesService.expensesInOneCategory("Pizza");
+        Set<Builder> categorizedExpenses = financesService.expensesInOneCategory("Pizza");
 
         assertTrue(categorizedExpenses.contains(expense2));
         assertTrue(categorizedExpenses.contains(expense3));
@@ -161,10 +261,30 @@ class ExpenseTest {
 
     @Test
     void shouldReturnTheBiggestExpenseInGivenCategory() throws InvalidExpenseException {
-        Expense expense1 = Expense.from(3.22, LocalDate.now(), "Market", "Relax");
-        Expense expense2 = Expense.from(3.22, LocalDate.now(), "Market", "Pizza");
-        Expense expense3 = Expense.from(32.22, LocalDate.now(), "Market", "Pizza");
-        Expense expense4 = Expense.from(55, LocalDate.now(), "Market", "Pizza");
+        Builder expense1 = builder()
+                .amount(10)
+                .date(LocalDate.now().minusWeeks(1))
+                .place("Market")
+                .category("Relax")
+                .build();
+        Builder expense2 = builder()
+                .amount(22.1)
+                .date(LocalDate.now().minusWeeks(1))
+                .place("Market")
+                .category("Pizza")
+                .build();
+        Builder expense3 = builder()
+                .amount(32.22)
+                .date(LocalDate.now().minusWeeks(1))
+                .place("Market")
+                .category("Pizza")
+                .build();
+        Builder expense4 = builder()
+                .amount(55)
+                .date(LocalDate.now().minusWeeks(1))
+                .place("Market")
+                .category("Pizza")
+                .build();
 
         ExpenseService financesService = new ExpenseService();
         financesService.addExpense(expense1);
@@ -180,11 +300,36 @@ class ExpenseTest {
 
     @Test
     void shouldReturnMapWithCategoryAndTheBiggestExpenseInThatCategory() throws InvalidExpenseException {
-        Expense expense1 = Expense.from(3.22, LocalDate.now(), "Market", "Relax");
-        Expense expense2 = Expense.from(3.22, LocalDate.now(), "Market", "Pizza");
-        Expense expense3 = Expense.from(32.22, LocalDate.now(), "Market", "Pizza");
-        Expense expense4 = Expense.from(55, LocalDate.now(), "Market", "Pizza");
-        Expense expense5 = Expense.from(30.2, LocalDate.now(), "Market", "Relax");
+        Builder expense1 = builder()
+                .amount(10)
+                .date(LocalDate.now().minusWeeks(1))
+                .place("Market")
+                .category("Relax")
+                .build();
+        Builder expense2 = builder()
+                .amount(22.1)
+                .date(LocalDate.now().minusWeeks(1))
+                .place("Market")
+                .category("Pizza")
+                .build();
+        Builder expense3 = builder()
+                .amount(32.22)
+                .date(LocalDate.now().minusWeeks(1))
+                .place("Market")
+                .category("Pizza")
+                .build();
+        Builder expense4 = builder()
+                .amount(55)
+                .date(LocalDate.now().minusWeeks(1))
+                .place("Market")
+                .category("Pizza")
+                .build();
+        Builder expense5 = builder()
+                .amount(30.2)
+                .date(LocalDate.now().minusWeeks(1))
+                .place("Market")
+                .category("Relax")
+                .build();
 
         ExpenseService financesService = new ExpenseService();
         financesService.addExpense(expense1);
@@ -201,11 +346,36 @@ class ExpenseTest {
 
     @Test
     void shouldReturnMapWithCategoryAndTheAverageOfExpensesInThatCategory() throws InvalidExpenseException {
-        Expense expense1 = Expense.from(3.22, LocalDate.now(), "Market", "Relax");
-        Expense expense2 = Expense.from(3.22, LocalDate.now(), "Market", "Pizza");
-        Expense expense3 = Expense.from(32.22, LocalDate.now(), "Market", "Pizza");
-        Expense expense4 = Expense.from(55, LocalDate.now(), "Market", "Pizza");
-        Expense expense5 = Expense.from(30.2, LocalDate.now(), "Market", "Relax");
+        Builder expense1 = builder()
+                .amount(10)
+                .date(LocalDate.now())
+                .place("Market")
+                .category("Relax")
+                .build();
+        Builder expense2 = builder()
+                .amount(22.1)
+                .date(LocalDate.now())
+                .place("Market")
+                .category("Pizza")
+                .build();
+        Builder expense3 = builder()
+                .amount(32.22)
+                .date(LocalDate.now())
+                .place("Market")
+                .category("Pizza")
+                .build();
+        Builder expense4 = builder()
+                .amount(55)
+                .date(LocalDate.now())
+                .place("Market")
+                .category("Pizza")
+                .build();
+        Builder expense5 = builder()
+                .amount(30.2)
+                .date(LocalDate.now())
+                .place("Market")
+                .category("Relax")
+                .build();
 
         ExpenseService financesService = new ExpenseService();
         financesService.addExpense(expense1);
@@ -217,8 +387,8 @@ class ExpenseTest {
         Map<String, Double> map = financesService.mapOfCategoryAndAverageOfExpenses();
 
 
-        assertTrue(map.containsValue(30.15));
-        assertTrue(map.containsValue(16.71));
+        assertTrue(map.containsValue(36.44));
+        assertTrue(map.containsValue(20.1));
         assertEquals(2, map.size());
 
 

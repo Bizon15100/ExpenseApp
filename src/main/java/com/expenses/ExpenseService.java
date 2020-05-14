@@ -2,39 +2,39 @@ package com.expenses;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ExpenseService {
-    private Set<Expense> expenses = new HashSet<>();
+import static com.expenses.Expense.*;
 
-    public void addExpense(Expense expense) {
+public class ExpenseService {
+    private Set<Builder> expenses = new HashSet<>();
+
+    public void addExpense(Builder expense) {
         expenses.add(expense);
     }
 
-    public Set<Expense> getExpenseSet() {
+    public Set<Builder> getExpenseSet() {
         return new HashSet<>(expenses);
     }
 
-    public Set<Expense> findExpensesInRange(LocalDate from, LocalDate to) {
-        Set<Expense> expensesInRange = new HashSet<>();
-        for (Expense expense : expenses) {
-            if (!expense.getDate().isBefore(from) && !expense.getDate().isAfter(to)) {
+    public Set<Builder> findExpensesInRange(LocalDate from, LocalDate to) {
+        Set<Builder> expensesInRange = new HashSet<>();
+        for (Builder expense : expenses) {
+            if (expense.getDate().isBefore(to) & expense.getDate().isAfter(from)){
                 expensesInRange.add(expense);
             }
         }
         return expensesInRange;
     }
 
-    public List<Expense> getNLargestExpenses(int number) {
+    public List<Builder> getNLargestExpenses(int number) {
 
-        List<Expense> nLargestExpenses = new LinkedList<>();
-        List<Expense> largestExpenses = new LinkedList<>(expenses);
-        largestExpenses.sort(Comparator.comparingDouble(Expense::getAmount));
-        for (int i = largestExpenses.size() - 1; i > number; i--) {
+        List<Builder> nLargestExpenses = new LinkedList<>();
+        List<Builder> largestExpenses = new LinkedList<>(expenses);
+        largestExpenses.sort(Comparator.comparing(Builder::getAmount));
+        for (int i = largestExpenses.size() - 1; i >= number; i--) {
             nLargestExpenses.add(largestExpenses.get(i));
         }
         return nLargestExpenses;
@@ -42,10 +42,10 @@ public class ExpenseService {
 
     }
 
-    public Set<Expense> findExpensesByDate(LocalDate date) {
-        Set<Expense> expenseWithRequestedDate = new HashSet<>();
+    public Set<Builder> findExpensesByDate(LocalDate date) {
+        Set<Builder> expenseWithRequestedDate = new HashSet<>();
 
-        for (Expense expense : expenses) {
+        for (Builder expense : expenses) {
             if (expense.getDate().equals(date)) {
                 expenseWithRequestedDate.add(expense);
             }
@@ -53,9 +53,9 @@ public class ExpenseService {
         return expenseWithRequestedDate;
     }
 
-    public Set<Expense> expensesInOneCategory(String category) {
-        Set<Expense> expensesInOneCategory = new HashSet<>();
-        for (Expense expense : expenses) {
+    public Set<Builder> expensesInOneCategory(String category) {
+        Set<Builder> expensesInOneCategory = new HashSet<>();
+        for (Builder expense : expenses) {
             if (expense.getCategory().equals(category)) {
                 expensesInOneCategory.add(expense);
             }
@@ -64,22 +64,24 @@ public class ExpenseService {
     }
 
     public Double averageOfExpensesInRangeOfTime(LocalDate from, LocalDate to) {
-        Set<Expense> expensesInRange = findExpensesInRange(from, to);
+        Set<Builder> expensesInRange = findExpensesInRange(from, to);
         double sum = 0d;
-        for (Expense expense : expensesInRange) {
+        for (Builder expense : expensesInRange) {
             sum = sum + expense.getAmount();
         }
         if (expensesInRange.size() != 0 | !expensesInRange.isEmpty()) {
-            return sum / expensesInRange.size() + sum % expensesInRange.size();
+            return sum / expensesInRange.size() + sum%expensesInRange.size();
         } else return 0d;
     }
 
-    public double theBiggestExpenseInGivenCategory(String category) {
-        Set<Expense> expensesInCategory = expensesInOneCategory(category);
-        double result = 0;
+    public Double theBiggestExpenseInGivenCategory(String category) {
+        Set<Builder> expensesInCategory = expensesInOneCategory(category);
+        double result;
 
-        List<Expense> expenseList = expensesInCategory.stream().collect(Collectors.toList());
-        expenseList.sort(Comparator.comparingDouble(Expense::getAmount));
+        List<Builder> expenseList = expensesInCategory
+                .stream()
+                .sorted(Comparator.comparingDouble(Builder::getAmount))
+                .collect(Collectors.toList());
 
         result = expenseList.get(expenseList.size() - 1).getAmount();
 
@@ -88,7 +90,7 @@ public class ExpenseService {
 
     public Map<String, Double> mapOfCategoryAndLargestExpense() {
         Map<String, Double> map = new HashMap<>();
-        for (Expense expense : expenses) {
+        for (Builder expense : expenses) {
             if (!map.containsKey(expense.getCategory())) {
                 map.put(expense.getCategory(), theBiggestExpenseInGivenCategory(expense.getCategory()));
             }
@@ -96,26 +98,25 @@ public class ExpenseService {
         return map;
     }
 
-    public double averageOfExpensesInCategory(String category) {
-        Set<Expense> expensesInOneCategory = expensesInOneCategory(category);
-        double sum = 0;
+    public Double averageOfExpensesInCategory(String category) {
+        Set<Builder> expensesInOneCategory = expensesInOneCategory(category);
+        double sum = 0d;
         double average;
-        for (Expense expense : expensesInOneCategory) {
+        for (Builder expense : expensesInOneCategory) {
             sum = sum + expense.getAmount();
         }
-        average = sum /expensesInOneCategory.size();
+        average = sum / expensesInOneCategory.size();
         return average;
     }
 
     public Map<String, Double> mapOfCategoryAndAverageOfExpenses() {
         Map<String, Double> map = new HashMap<>();
 
-        for (Expense expense : expenses) {
+        for (Builder expense : expenses) {
             if (!map.containsKey(expense.getCategory())) {
                 double value = averageOfExpensesInCategory(expense.getCategory());
-                BigDecimal bd = new BigDecimal(value).setScale(2, RoundingMode.HALF_UP);
-                double newInput = bd.doubleValue();
-                map.put(expense.getCategory(), newInput);
+                BigDecimal bigDecimal = BigDecimal.valueOf(value).setScale(2, RoundingMode.HALF_UP);
+                map.put(expense.getCategory(), bigDecimal.doubleValue());
             }
         }
         return map;
@@ -125,8 +126,12 @@ public class ExpenseService {
     public String toString() {
         StringBuilder message = new StringBuilder("Expenses: \n");
 
-        for (Expense expense : expenses) {
-            message.append(expense).append("\n");
+        for (Builder expense : expenses) {
+             message.append("|Amount|: ").append(expense.getAmount()).append(" ")
+                     .append("|Date|: ").append(expense.getDate()).append(" ")
+                     .append("|Place|: ").append(expense.getPlace()).append(" ")
+                     .append("|Category|: ") .append(expense.getCategory()).append(" ")
+                    .append("\n");
         }
 
         return message.toString();
