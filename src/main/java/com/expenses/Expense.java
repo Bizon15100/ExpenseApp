@@ -9,7 +9,7 @@ import java.time.LocalDate;
 public class  Expense {
 
     public static final class Builder {
-        private double amount;
+        private BigDecimal amount;
         private LocalDate date;
         private String place;
         private String category;
@@ -17,7 +17,7 @@ public class  Expense {
         public LocalDate getDate(){
             return this.date;
         }
-        public double getAmount(){
+        public BigDecimal getAmount(){
             return this.amount;
         }
         public String getPlace(){
@@ -27,7 +27,7 @@ public class  Expense {
             return this.category;
         }
 
-        public Builder amount(double amount) {
+        public Builder amount(BigDecimal amount) {
             this.amount = amount;
             return this;
         }
@@ -49,13 +49,13 @@ public class  Expense {
 
         public Builder build() throws InvalidExpenseException {
 
-            if (amount < 0) {
+            if (amount.compareTo(BigDecimal.ZERO) < 0) {
                 throw new InvalidExpenseException("Amount should be grater than 0.");
             }
             if (date == null || date.isAfter(LocalDate.now())) {
                 throw new InvalidExpenseException("You have to write a past date.");
             }
-            if (place.isBlank()) {
+            if (place.isBlank() || place==null) {
                 throw new InvalidExpenseException("You have to write a place of expense.");
             }
 
@@ -76,7 +76,9 @@ public class  Expense {
     static boolean checkPrecisionOfDouble(String attribute) {
         String s = String.valueOf(attribute);
         String[] split = s.split("\\.");
-        if (split.length <= 2) {
+        if (!s.contains(".")){
+            return true;
+        } else if (split.length <= 2) {
             return split[1].length() == 2 | split[1].length() == 1 | split[1].length() == 0;
         } else return false;
 
