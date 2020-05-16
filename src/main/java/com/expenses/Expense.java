@@ -6,7 +6,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 
 
-public class Expense {
+public class  Expense {
 
     public static final class Builder {
         private double amount;
@@ -48,8 +48,8 @@ public class Expense {
         }
 
         public Builder build() throws InvalidExpenseException {
-            BigDecimal value = BigDecimal.valueOf(amount);
-            if (value.intValue() < 0) {
+
+            if (amount < 0) {
                 throw new InvalidExpenseException("Amount should be grater than 0.");
             }
             if (date == null || date.isAfter(LocalDate.now())) {
@@ -58,8 +58,8 @@ public class Expense {
             if (place.isBlank()) {
                 throw new InvalidExpenseException("You have to write a place of expense.");
             }
-            BigDecimal amountInScale = value.setScale(2, RoundingMode.HALF_UP);
-            if (!amountInScale.toString().matches("^(\\d+)\\.(\\d\\d)$|^(\\d+)\\.(\\d)$|^(\\d+)$")) {
+
+            if (!checkPrecisionOfDouble(String.valueOf(amount))) {
                 throw new InvalidExpenseException("0.00");
             }
             Builder expense = new Builder();

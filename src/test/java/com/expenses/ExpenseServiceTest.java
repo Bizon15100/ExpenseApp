@@ -13,7 +13,7 @@ import static com.expenses.Expense.*;
 import static com.expenses.Expense.builder;
 import static org.junit.jupiter.api.Assertions.*;
 
-class ExpenseTest {
+class ExpenseServiceTest {
 
     @Test
     void shouldReturnDatesInRangeOfDates() throws InvalidExpenseException {
@@ -116,9 +116,9 @@ class ExpenseTest {
     void shouldNotAllowNull() {
         LocalDate dateAsNull = null;
 
-        Executable createExpenseInFuture = () -> builder().amount(100).date(dateAsNull).place("Market").category("Pizza").build();
+        Executable createNullDate = () -> builder().amount(100).date(dateAsNull).place("Market").category("Pizza").build();
 
-        assertThrows(InvalidExpenseException.class, createExpenseInFuture);
+        assertThrows(InvalidExpenseException.class, createNullDate);
     }
 
     @Test
@@ -135,7 +135,7 @@ class ExpenseTest {
     void shouldThrowErrorBecauseOfInvalidFormatOfAmount(double amount) {
        Executable create = () -> builder().amount(amount).date(LocalDate.now()).place("Market").category("Pizza").build();
 
-        assertDoesNotThrow(create);
+        assertThrows(InvalidExpenseException.class ,create);
 
     }
 

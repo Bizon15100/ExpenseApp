@@ -36,7 +36,7 @@ public class ExpenseApp {
                 .build();
 
         Builder expense5 = builder()
-                .amount(30.2)
+                .amount(30.20776)
                 .date(LocalDate.now())
                 .place("Market")
                 .category("Pizza")
