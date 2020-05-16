@@ -25,7 +25,8 @@ public class ExpenseCliApp {
         System.out.println("Welcome in my app.");
         System.out.println("Menu: ");
         System.out.println("Add expense -> insert add");
-        System.out.println("Print all added expenses -> insert expensesAll");
+        System.out.println("Quick add of expense -> insert quickAdd");
+        System.out.println("Print all added expenses -> insert expenseAll");
         System.out.println("Find expense by given category -> insert findCategory");
         System.out.println("Find expenses by given range of dates -> insert  findRange");
         System.out.println("Find given number of the largest expenses -> insert nLargest");
@@ -66,13 +67,41 @@ public class ExpenseCliApp {
 
                         service.addExpense(build);
                         System.out.println("Expense added to data");
-                        break;
-                    } catch (InvalidExpenseException e) {
+
+                    } catch (IllegalArgumentException e) {
                         e.printStackTrace();
+                        System.out.println("Invalid argument");
                         break;
                     }
                 }
-                case "expensesAll": {
+                case "quickAdd": {
+
+                    System.out.println("Enter expense in one line, format 'amount,date dd-MM-yyyy,place,category' ");
+                    String[] expenseInString = br.readLine().split(",");
+                    if (expenseInString.length == 4) {
+                        BigDecimal amount = BigDecimal.valueOf(Double.parseDouble(expenseInString[0]));
+                        LocalDate data;
+                        try {
+                            data = LocalDate.parse(expenseInString[1], DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+                        } catch (DateTimeException exception) {
+                            System.out.println("Entered data " + expenseInString[1] + " id invalid.");
+                            return;
+                        }
+                        String place = expenseInString[2];
+                        String category = expenseInString[3];
+                        Builder expense = builder()
+                                .amount(amount)
+                                .date(data)
+                                .place(place)
+                                .category(category)
+                                .build();
+                        service.addExpense(expense);
+                        System.out.println("Expense added to data");
+                        break;
+                    } else System.out.println("You should give 4 arguments, separated by comma");
+                    break;
+                }
+                case "expenseAll": {
                     Set<Builder> expenseSet = service.getExpenseSet();
                     if (!expenseSet.isEmpty()) {
                         for (Builder record : expenseSet) {
@@ -175,7 +204,7 @@ public class ExpenseCliApp {
                     System.out.println("Average of yours expenses in given time: " + bigDecimal);
                     break;
                 }
-                case "averageInCategory":{
+                case "averageInCategory": {
                     System.out.println("Enter category");
                     String categoryInput = br.readLine();
                     BigDecimal bigDecimal = service.averageOfExpensesInCategory(categoryInput);
@@ -183,13 +212,13 @@ public class ExpenseCliApp {
                     System.out.println(bigDecimal);
                     break;
                 }
-                case "mapAverage":{
+                case "mapAverage": {
                     Map<String, BigDecimal> mapCategoryAndAverage = service.mapOfCategoryAndAverageOfExpenses();
 
                     System.out.println(mapCategoryAndAverage.entrySet());
                     break;
                 }
-                case "mapLargest":{
+                case "mapLargest": {
                     Map<String, BigDecimal> mapLargest = service.mapOfCategoryAndLargestExpense();
 
                     System.out.println(mapLargest.entrySet());
