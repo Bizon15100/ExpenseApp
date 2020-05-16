@@ -223,41 +223,6 @@ class ExpenseServiceTest {
     }
 
     @Test
-    void byleco() throws InvalidExpenseException {
-        Builder expense1 = builder()
-                .amount(valueOf(30.0))
-                .date(LocalDate.now().minusWeeks(3))
-                .place("Market")
-                .category("Pizza")
-                .build();
-        Builder expense2 = builder()
-                .amount(valueOf(20.0))
-                .date(LocalDate.now().minusWeeks(2))
-                .place("Market")
-                .category("Pizza")
-                .build();
-        Builder expense3 = builder()
-                .amount(valueOf(10.0))
-                .date(LocalDate.now().minusWeeks(1))
-                .place("Market")
-                .category("Pizza")
-                .build();
-
-        ExpenseService service = new ExpenseService();
-        service.addExpense(expense1);
-        service.addExpense(expense2);
-        service.addExpense(expense3);
-
-        List<Builder> nLargestExpenses = service.getNLargestExpenses(3);
-        for (Builder record : nLargestExpenses) {
-            System.out.println("Amount: " + record.getAmount() +
-                    " |Data: " + record.getDate() +
-                    " |Place: " + record.getPlace() +
-                    " |Category: " + record.getCategory());
-        }
-    }
-
-    @Test
     void shouldReturnExpensesInOneCategory() throws InvalidExpenseException {
         Builder expense1 = builder()
                 .amount(valueOf(10))

@@ -14,6 +14,7 @@ import java.util.Set;
 
 import static com.expenses.Expense.Builder;
 import static com.expenses.Expense.builder;
+import static java.math.BigDecimal.*;
 
 public class ExpenseCliApp {
 
@@ -59,7 +60,7 @@ public class ExpenseCliApp {
                         }
 
                         Builder build = builder()
-                                .amount(BigDecimal.valueOf(Double.parseDouble(amount)))
+                                .amount(valueOf(Double.parseDouble(amount)))
                                 .date(data)
                                 .place(place)
                                 .category(category)
@@ -79,7 +80,12 @@ public class ExpenseCliApp {
                     System.out.println("Enter expense in one line, format 'amount,date dd-MM-yyyy,place,category' ");
                     String[] expenseInString = br.readLine().split(",");
                     if (expenseInString.length == 4) {
-                        BigDecimal amount = BigDecimal.valueOf(Double.parseDouble(expenseInString[0]));
+                        BigDecimal amount = ZERO;
+                        try {
+                            amount = valueOf(Double.parseDouble(expenseInString[0]));
+                        } catch (IllegalArgumentException e){
+                            e.printStackTrace();
+                        }
                         LocalDate data;
                         try {
                             data = LocalDate.parse(expenseInString[1], DateTimeFormatter.ofPattern("dd-MM-yyyy"));
