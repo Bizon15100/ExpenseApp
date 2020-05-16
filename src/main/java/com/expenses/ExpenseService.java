@@ -24,7 +24,7 @@ public class ExpenseService {
     public Set<Builder> findExpensesInRange(LocalDate from, LocalDate to) {
         Set<Builder> expensesInRange = new HashSet<>();
         for (Builder expense : expenses) {
-            if (expense.getDate().isBefore(to) & expense.getDate().isAfter(from)){
+            if (!expense.getDate().isBefore(from) & !expense.getDate().isAfter(to)){
                 expensesInRange.add(expense);
             }
         }
