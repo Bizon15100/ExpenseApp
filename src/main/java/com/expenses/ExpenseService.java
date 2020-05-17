@@ -11,25 +11,25 @@ import static java.math.BigDecimal.*;
 
 @SuppressWarnings("BigDecimalMethodWithoutRoundingCalled")
 public class ExpenseService {
-    private Set<Builder> expenses = new HashSet<>();
+    private Set<Expense> expenses = new HashSet<>();
 
-    public void addExpense(Builder expense) {
+    public void addExpense(Expense expense) {
         expenses.add(expense);
     }
 
-    public Set<Builder> getExpenseSet() {
+    public Set<Expense> getExpenseSet() {
         return new HashSet<>(expenses);
     }
 
-    public Set<Builder> findExpensesInRange(LocalDate from, LocalDate to) {
+    public Set<Expense> findExpensesInRange(LocalDate from, LocalDate to) {
         ExpenseInRangeOfTime expenseInRangeOfTime = new ExpenseInRangeOfTime(from,to);
-        Set<Builder> expensesInRange = expenses.stream()
+        Set<Expense> expensesInRange = expenses.stream()
                 .filter(expenseInRangeOfTime)
                 .collect(Collectors.toSet());       // praca domowa
 
 
 
-     //   for (Builder expense : expenses) {
+     //   for (Expense expense : expenses) {
      //       if (!expense.getDate().isBefore(from) & !expense.getDate().isAfter(to)){
      //           expensesInRange.add(expense);
      //       }
@@ -37,11 +37,11 @@ public class ExpenseService {
         return expensesInRange;
     }
 
-    public List<Builder> getNLargestExpenses(int number) {
+    public List<Expense> getNLargestExpenses(int number) {
 
-        List<Builder> nLargestExpenses = new LinkedList<>();
-        List<Builder> largestExpenses = new LinkedList<>(expenses);
-        largestExpenses.sort(Comparator.comparing(Builder::getAmount));
+        List<Expense> nLargestExpenses = new LinkedList<>();
+        List<Expense> largestExpenses = new LinkedList<>(expenses);
+        largestExpenses.sort(Comparator.comparing(Expense::getAmount));
         int positionStop = largestExpenses.size() - number;
         for (int i = largestExpenses.size()-1; i >= positionStop; i--) {
             nLargestExpenses.add(largestExpenses.get(i));
@@ -51,10 +51,10 @@ public class ExpenseService {
 
     }
 
-    public Set<Builder> findExpensesByDate(LocalDate date) {
-        Set<Builder> expenseWithRequestedDate = new HashSet<>();
+    public Set<Expense> findExpensesByDate(LocalDate date) {
+        Set<Expense> expenseWithRequestedDate = new HashSet<>();
 
-        for (Builder expense : expenses) {
+        for (Expense expense : expenses) {
             if (expense.getDate().equals(date)) {
                 expenseWithRequestedDate.add(expense);
             }
@@ -62,9 +62,9 @@ public class ExpenseService {
         return expenseWithRequestedDate;
     }
 
-    public Set<Builder> expensesInOneCategory(String category) {
-        Set<Builder> expensesInOneCategory = new HashSet<>();
-        for (Builder expense : expenses) {
+    public Set<Expense> expensesInOneCategory(String category) {
+        Set<Expense> expensesInOneCategory = new HashSet<>();
+        for (Expense expense : expenses) {
             if (expense.getCategory().equals(category)) {
                 expensesInOneCategory.add(expense);
             }
@@ -73,9 +73,9 @@ public class ExpenseService {
     }
 
     public BigDecimal averageOfExpensesInRangeOfTime(LocalDate from, LocalDate to) {
-        Set<Builder> expensesInRange = findExpensesInRange(from, to);
+        Set<Expense> expensesInRange = findExpensesInRange(from, to);
         BigDecimal sum = ZERO;
-        for (Builder expense : expensesInRange) {
+        for (Expense expense : expensesInRange) {
             sum =  expense.getAmount().add(sum);
         }
         if (expensesInRange.size() != 0 | !expensesInRange.isEmpty()) {
@@ -85,12 +85,12 @@ public class ExpenseService {
     }
 
     public BigDecimal theBiggestExpenseInGivenCategory(String category) {
-        Set<Builder> expensesInCategory = expensesInOneCategory(category);
+        Set<Expense> expensesInCategory = expensesInOneCategory(category);
         BigDecimal result = null;
 
-        List<Builder> expenseList = expensesInCategory
+        List<Expense> expenseList = expensesInCategory
                 .stream()
-                .sorted(Comparator.comparing(Builder::getAmount))
+                .sorted(Comparator.comparing(Expense::getAmount))
                 .collect(Collectors.toList());
 
         result = expenseList.get(expenseList.size() - 1).getAmount();
@@ -100,7 +100,7 @@ public class ExpenseService {
 
     public Map<String, BigDecimal> mapOfCategoryAndLargestExpense() {
         Map<String, BigDecimal> map = new HashMap<>();
-        for (Builder expense : expenses) {
+        for (Expense expense : expenses) {
             if (!map.containsKey(expense.getCategory())) {
                 map.put(expense.getCategory(), theBiggestExpenseInGivenCategory(expense.getCategory()));
             }
@@ -109,10 +109,10 @@ public class ExpenseService {
     }
 
     public BigDecimal averageOfExpensesInCategory(String category) {
-        Set<Builder> expensesInOneCategory = expensesInOneCategory(category);
+        Set<Expense> expensesInOneCategory = expensesInOneCategory(category);
         BigDecimal sum = ZERO;
         BigDecimal average;
-        for (Builder expense : expensesInOneCategory) {
+        for (Expense expense : expensesInOneCategory) {
             sum = sum.add(expense.getAmount());
         }
         average = sum.divide(valueOf(expensesInOneCategory.size()));
@@ -122,7 +122,7 @@ public class ExpenseService {
     public Map<String, BigDecimal> mapOfCategoryAndAverageOfExpenses() {
         Map<String, BigDecimal> map = new HashMap<>();
 
-        for (Builder expense : expenses) {
+        for (Expense expense : expenses) {
             if (!map.containsKey(expense.getCategory())) {
                 BigDecimal value = averageOfExpensesInCategory(expense.getCategory());
                 BigDecimal bigDecimal = value.setScale(2, RoundingMode.HALF_UP);
@@ -132,17 +132,11 @@ public class ExpenseService {
         return map;
     }
 
-    @Override
     public String toString() {
-        StringBuilder message = new StringBuilder("Expenses: \n");
+        StringBuilder message = new StringBuilder("Expenses:\n");
 
-
-        for (Builder expense : expenses) {
-            message.append("|Amount|: ").append(expense.getAmount()).append(" ")
-                    .append("|Date|: ").append(expense.getDate()).append(" ")
-                    .append("|Place|: ").append(expense.getPlace()).append(" ")
-                    .append("|Category|: ").append(expense.getCategory()).append(" ")
-                    .append("\n");
+        for (Expense expense : expenses) {
+            message.append(expense).append("\n");
         }
 
         return message.toString();

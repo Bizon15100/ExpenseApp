@@ -5,7 +5,7 @@ import java.util.function.Predicate;
 
 import static com.expenses.Expense.*;
 
-public class ExpenseInRangeOfTime implements Predicate<Builder> {
+public class ExpenseInRangeOfTime implements Predicate<Expense>  {
 
     private final LocalDate comparedDateFrom;
     private final LocalDate comparedDateTo;
@@ -17,7 +17,7 @@ public class ExpenseInRangeOfTime implements Predicate<Builder> {
 
 
     @Override
-    public boolean test(Builder expense) {
+    public boolean test(Expense expense) {
         return !expense.getDate().isBefore(comparedDateFrom) & !expense.getDate().isAfter(comparedDateTo);
     }
 }
