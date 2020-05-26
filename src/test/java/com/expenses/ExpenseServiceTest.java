@@ -1,22 +1,22 @@
 package com.expenses;
 
+import com.expenses.io.VarType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.expenses.Expense.builder;
+import static com.expenses.io.VarType.*;
 import static java.math.BigDecimal.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ExpenseServiceTest {
+    ExpenseService service = new ExpenseService();
 
     @Test
     void shouldReturnDatesInRangeOfDates() throws InvalidExpenseException {
@@ -117,9 +117,9 @@ class ExpenseServiceTest {
 
     @Test
     void shouldNotAllowNull() {
-        LocalDate dateAsNull = null;
+       // LocalDate dateAsNull = null;
 
-        Executable createNullDate = () -> builder().amount(valueOf(100)).date(dateAsNull).place("Market").category("Pizza").build();
+        Executable createNullDate = () -> builder().amount(valueOf(100)).date(null).place("Market").category("Pizza").build();
 
         assertThrows(InvalidExpenseException.class, createNullDate);
     }
@@ -170,7 +170,7 @@ class ExpenseServiceTest {
                 .category("Pizza")
                 .build();
         Expense expense3 = builder()
-                .amount(valueOf(100))
+                .amount(valueOf(120))
                 .date(requestedDate)
                 .place("Market")
                 .category("Pizza")
@@ -393,7 +393,60 @@ class ExpenseServiceTest {
         assertTrue(map.containsValue(valueOf(36.44)));
         assertTrue(map.containsValue(valueOf(20.10).setScale(2, RoundingMode.HALF_UP)));
         assertEquals(2, map.size());
-
-
     }
+
+    @Test
+    void smallTest() throws InvalidExpenseException {
+
+        Expense expense1 = builder()
+                .amount(valueOf(10.0))
+                .date(LocalDate.now())
+                .place("Market")
+                .category("Relax")
+                .build();
+        Expense expense2 = builder()
+                .amount(valueOf(22.0))
+                .date(LocalDate.now())
+                .place("Market")
+                .category("Pizza")
+                .build();
+        Expense expense3 = builder()
+                .amount(valueOf(320.0))
+                .date(LocalDate.now())
+                .place("Market")
+                .category("Pizza")
+                .build();
+        Expense expense4 = builder()
+                .amount(valueOf(30.0))
+                .date(LocalDate.now().minusWeeks(2))
+                .place("Darket")
+                .category("Pizza")
+                .build();
+        Expense expense5 = builder()
+                .amount(valueOf(511.0))
+                .date(LocalDate.now())
+                .place("House")
+                .category("Relax")
+                .build();
+
+        ExpenseService service = new ExpenseService();
+        service.addExpense(expense1);
+        service.addExpense(expense2);
+        service.addExpense(expense3);
+        service.addExpense(expense4);
+        service.addExpense(expense5);
+
+        service.getExpenseSet()
+                .stream()
+                .sorted(Comparator.comparing(Expense::getDate).reversed())
+                .forEach(System.out::println);
+       // financesService.getExpenseSet().stream().sorted(Comparator.comparing(Expense::getAmount)).forEach(System.out::println);
+
+      //  financesService.getExpenseSet().forEach(System.out::println);
+        System.out.println();
+        service.sortByObject(DATE, "asc").forEach(System.out::println);
+                //.stream().sorted(Comparator.comparing(Expense::getAmount)).forEach(System.out::println);
+    }
+
+
 }

@@ -1,36 +1,24 @@
 package com.expenses;
 
+import com.expenses.io.FileType;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.Map;
-import java.util.Scanner;
 
 
-@SuppressWarnings("InfiniteLoopStatement")
 public class ExpenseCliApp {
 
     public static void main(String[] args) throws InvalidExpenseException, IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        Scanner scanner = new Scanner(System.in);
         ExpenseCliMethod method = new ExpenseCliMethod();
-
         ExpenseService service = new ExpenseService();
+
         System.out.println("Welcome in my app.");
-        System.out.println("Menu: ");
-        System.out.println("Add expense -> insert add");
-        System.out.println("Quick add of expense -> insert quickAdd");
-        System.out.println("Print all added expenses -> insert expenseAll");
-        System.out.println("Find expense by given category -> insert findCategory");
-        System.out.println("Find expenses by given range of dates -> insert  findRange");
-        System.out.println("Find given number of the largest expenses -> insert nLargest");
-        System.out.println("Print the average of expenses in given range of time -> insert averageFromTo");
-        System.out.println("To print average of expenses in given category -> insert averageInCategory");
-        System.out.println("To print a map of all categories and its averages -> insert mapAverage");
-        System.out.println("to print a map of all categories and its largest expense -> insert mapLargest");
-        System.out.println("Exit the app -> insert x");
+        method.loadData("/data.json",FileType.JSON);
         while (true) {
+            method.menu();
             System.out.println("Insert command");
             String command = br.readLine();
             switch (command) {
@@ -79,13 +67,22 @@ public class ExpenseCliApp {
 
                     break;
                 }
+                case "save": {
+                    method.writeData("/data.csv", FileType.CSV);
+                    break;
+                }
                 case "x": {
+                   method.writeData("./data.json", FileType.JSON);
                     System.out.println("Application closed");
-                    System.exit(0);
+                    System.exit(1);
                 }
                 default:
                     System.out.println("Unknown command");
             }
         }
+
+
+
+
     }
 }

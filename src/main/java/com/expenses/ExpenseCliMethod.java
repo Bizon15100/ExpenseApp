@@ -1,12 +1,15 @@
 package com.expenses;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import com.expenses.io.ExpenseCsvMapper;
+import com.expenses.io.ExpenseFileMapper;
+import com.expenses.io.FileType;
+
+import java.io.*;
 import java.math.BigDecimal;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
@@ -21,6 +24,20 @@ public class ExpenseCliMethod {
     Scanner scanner = new Scanner(System.in);
 
     ExpenseService service = new ExpenseService();
+    public void menu(){
+        System.out.println("Menu: ");
+        System.out.println("Add expense -> insert add");
+        System.out.println("Quick add of expense -> insert quickAdd");
+        System.out.println("Print all added expenses -> insert expenseAll");
+        System.out.println("Find expense by given category -> insert findCategory");
+        System.out.println("Find expenses by given range of dates -> insert  findRange");
+        System.out.println("Find given number of the largest expenses -> insert nLargest");
+        System.out.println("Print the average of expenses in given range of time -> insert averageFromTo");
+        System.out.println("To print average of expenses in given category -> insert averageInCategory");
+        System.out.println("To print a map of all categories and its averages -> insert mapAverage");
+        System.out.println("to print a map of all categories and its largest expense -> insert mapLargest");
+        System.out.println("Exit the app -> insert x");
+    }
 
     public void Add(){
         try {
@@ -98,6 +115,7 @@ public class ExpenseCliMethod {
             }
             service.addExpense(expense);
             System.out.println("Expense added to data");
+
 
         } else System.out.println("You should give 4 arguments, separated by comma");
     }
@@ -205,6 +223,56 @@ public class ExpenseCliMethod {
         BigDecimal bigDecimal = service.averageOfExpensesInRangeOfTime(dataFrom, dataTo);
         System.out.println("Average of yours expenses in given time: " + bigDecimal);
     }
+    public void WriterCsv(){
+        ExpenseCsvMapper csvMapper = new ExpenseCsvMapper();
+        ExpenseService service = new ExpenseService();
+        StringWriter writer = new StringWriter();
+        Set<Expense> expenses = service.getExpenseSet();
+        for (Expense record :expenses) {
+          writer  = new StringWriter();
+          writer.write(record.toString());
+          writer.flush();
 
+        }
+        try {
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public void loadData(String fileName, FileType fileType) throws IOException, InvalidExpenseException {
+        System.out.println("Loading data from " + fileName);
+
+        Set<Expense> expenses;
+        try {
+            ExpenseFileMapper expenseFileMapper = new ExpenseFileMapper();
+            expenses = expenseFileMapper.readFromFile(fileName,fileType);
+        } catch (IOException exception){
+            System.out.println("Could not load data from " + fileName
+                    + ": " + exception.getMessage());
+            return;
+        }
+        expenses.forEach(service::addExpense);
+        System.out.println("Successfully loaded " + expenses);
+    }
+    public void writeData(String fileName, FileType fileType) throws IOException, InvalidExpenseException {
+        System.out.println("Saving data to " + fileName);
+
+       Set<Expense> expenses = service.getExpenseSet();
+        try {
+            ExpenseFileMapper expenseFileMapper = new ExpenseFileMapper();
+            expenseFileMapper.writeToFile(fileName,fileType,expenses);
+        } catch (IOException exception) {
+            System.out.println("Could not load data from " + fileName
+                    + ": " + exception.getMessage());
+            return;
+        }
+
+        System.out.println("Successfully saved " + expenses.size() + " expenses.");
+
+    }
+    public void cleanData(String fileName, FileType fileType){
+
+    }
 
 }

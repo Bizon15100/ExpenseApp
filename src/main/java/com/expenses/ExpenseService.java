@@ -1,16 +1,20 @@
 package com.expenses;
 
+import com.expenses.io.VarType;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static com.expenses.Expense.*;
-import static java.math.BigDecimal.*;
+import static java.math.BigDecimal.ZERO;
+import static java.math.BigDecimal.valueOf;
+import static java.util.Comparator.comparing;
 
-@SuppressWarnings("BigDecimalMethodWithoutRoundingCalled")
-public class ExpenseService {
+@SuppressWarnings("ALL")
+public class ExpenseService implements Comparator<Expense>{
     private Set<Expense> expenses = new HashSet<>();
 
     public void addExpense(Expense expense) {
@@ -22,18 +26,16 @@ public class ExpenseService {
     }
 
     public Set<Expense> findExpensesInRange(LocalDate from, LocalDate to) {
-        ExpenseInRangeOfTime expenseInRangeOfTime = new ExpenseInRangeOfTime(from,to);
+        ExpenseInRangeOfTime expenseInRangeOfTime = new ExpenseInRangeOfTime(from, to);
         Set<Expense> expensesInRange = expenses.stream()
                 .filter(expenseInRangeOfTime)
                 .collect(Collectors.toSet());       // praca domowa
 
-
-
-     //   for (Expense expense : expenses) {
-     //       if (!expense.getDate().isBefore(from) & !expense.getDate().isAfter(to)){
-     //           expensesInRange.add(expense);
-     //       }
-     //   }
+        //   for (Expense expense : expenses) {
+        //       if (!expense.getDate().isBefore(from) & !expense.getDate().isAfter(to)){
+        //           expensesInRange.add(expense);
+        //       }
+        //   }
         return expensesInRange;
     }
 
@@ -41,9 +43,9 @@ public class ExpenseService {
 
         List<Expense> nLargestExpenses = new LinkedList<>();
         List<Expense> largestExpenses = new LinkedList<>(expenses);
-        largestExpenses.sort(Comparator.comparing(Expense::getAmount));
+        largestExpenses.sort(comparing(Expense::getAmount));
         int positionStop = largestExpenses.size() - number;
-        for (int i = largestExpenses.size()-1; i >= positionStop; i--) {
+        for (int i = largestExpenses.size() - 1; i >= positionStop; i--) {
             nLargestExpenses.add(largestExpenses.get(i));
         }
         return nLargestExpenses;
@@ -76,27 +78,50 @@ public class ExpenseService {
         Set<Expense> expensesInRange = findExpensesInRange(from, to);
         BigDecimal sum = ZERO;
         for (Expense expense : expensesInRange) {
-            sum =  expense.getAmount().add(sum);
+            sum = expense.getAmount().add(sum);
         }
         if (expensesInRange.size() != 0 | !expensesInRange.isEmpty()) {
             return sum.divide(valueOf(expensesInRange.size()));
-                    //+ sum%expensesInRange.size();
+            //+ sum%expensesInRange.size();
         } else return ZERO;
     }
 
     public BigDecimal theBiggestExpenseInGivenCategory(String category) {
         Set<Expense> expensesInCategory = expensesInOneCategory(category);
-        BigDecimal result = null;
+        BigDecimal result = ZERO;
 
         List<Expense> expenseList = expensesInCategory
                 .stream()
-                .sorted(Comparator.comparing(Expense::getAmount))
+                .sorted(comparing(Expense::getAmount))
                 .collect(Collectors.toList());
 
         result = expenseList.get(expenseList.size() - 1).getAmount();
 
         return result;
     }
+
+    public Set<Expense> sortByObject(VarType type, String ascOrDesc) {
+
+        if (type.equals(VarType.AMOUNT)) {
+          expenses.stream()
+                  .sorted( comparing(Expense::getAmount))
+                  .collect(Collectors.toSet());
+      }
+        if (type.equals(VarType.PLACE)) {
+            expenses.stream()
+                    .sorted(ascOrDesc.equals("asc") ? comparing(Expense::getPlace) : comparing(Expense::getPlace).reversed()).collect(Collectors.toSet());
+        }
+        if (type.equals(VarType.DATE)) {
+            expenses.stream()
+                    .sorted(ascOrDesc.equals("asc") ? comparing(Expense::getDate) : comparing(Expense::getDate).reversed()).collect(Collectors.toSet());
+        }
+        if (type.equals(VarType.CATEGORY)) {
+            expenses.stream()
+                    .sorted(ascOrDesc.equals("asc") ? comparing(Expense::getCategory) : comparing(Expense::getCategory).reversed()).collect(Collectors.toSet());
+        }
+        return expenses;
+    }
+
 
     public Map<String, BigDecimal> mapOfCategoryAndLargestExpense() {
         Map<String, BigDecimal> map = new HashMap<>();
@@ -142,5 +167,11 @@ public class ExpenseService {
         return message.toString();
     }
 
-
+    @Override
+    public int compare(Expense o1, Expense o2) {
+        if (o1.equals(o2)){
+            return 1;
+        }
+        return 0;
+    }
 }

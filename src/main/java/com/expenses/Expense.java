@@ -1,9 +1,12 @@
 package com.expenses;
 
 
+import org.jetbrains.annotations.NotNull;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 
 public class  Expense {
@@ -29,24 +32,12 @@ public class  Expense {
     }
 
 
+
     public static final class Builder {
         private BigDecimal amount;
         private LocalDate date;
         private String place;
         private String category;
-
-        public LocalDate getDate(){
-            return this.date;
-        }
-        public BigDecimal getAmount(){
-            return this.amount;
-        }
-        public String getPlace(){
-            return this.place;
-        }
-        public String getCategory(){
-            return this.category;
-        }
 
         public Builder amount(BigDecimal amount) {
             this.amount = amount;
@@ -92,6 +83,21 @@ public class  Expense {
         }
 
     }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Expense expense = (Expense) o;
+        return Objects.equals(amount, expense.amount) &&
+                Objects.equals(date, expense.date) &&
+                Objects.equals(place, expense.place) &&
+                Objects.equals(category, expense.category);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(amount, date, place, category);
+    }
 
 
     static boolean checkPrecisionOfDouble(String attribute) {
@@ -115,8 +121,7 @@ public class  Expense {
                 .ofPattern("dd-MM-yyyy");
         String message = "{%s, %s, %s, %s}";
 
-        return String.format(message,
-                date.format(dateFormat), amount, place, category);
+        return String.format(message,amount, date.format(dateFormat),  place, category);
     }
 
 }
