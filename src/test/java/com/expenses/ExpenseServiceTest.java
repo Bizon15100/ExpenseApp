@@ -1,6 +1,5 @@
 package com.expenses;
 
-import com.expenses.io.VarType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -16,7 +15,6 @@ import static java.math.BigDecimal.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ExpenseServiceTest {
-    ExpenseService service = new ExpenseService();
 
     @Test
     void shouldReturnDatesInRangeOfDates() throws InvalidExpenseException {

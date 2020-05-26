@@ -3,8 +3,6 @@ package com.expenses;
 import java.time.LocalDate;
 import java.util.function.Predicate;
 
-import static com.expenses.Expense.*;
-
 public class ExpenseInRangeOfTime implements Predicate<Expense>  {
 
     private final LocalDate comparedDateFrom;

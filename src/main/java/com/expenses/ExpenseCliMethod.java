@@ -1,21 +1,17 @@
 package com.expenses;
 
-import com.expenses.io.ExpenseCsvMapper;
 import com.expenses.io.ExpenseFileMapper;
 import com.expenses.io.FileType;
-
 import java.io.*;
 import java.math.BigDecimal;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
 import static com.expenses.Expense.builder;
-import static java.math.BigDecimal.ZERO;
 import static java.math.BigDecimal.valueOf;
 
 public class ExpenseCliMethod {
@@ -84,7 +80,7 @@ public class ExpenseCliMethod {
             e.printStackTrace();
         }
         if (expenseInString.length == 4) {
-            BigDecimal amount = ZERO;
+            BigDecimal amount;
             try {
                 amount = valueOf(Double.parseDouble(expenseInString[0]));
             } catch (IllegalArgumentException e){
@@ -128,7 +124,6 @@ public class ExpenseCliMethod {
                         " |Data: " + record.getDate() +
                         " |Place: " + record.getPlace() +
                         " |Category: " + record.getCategory());
-
             }
         } else {
             System.out.println("No expense found");
@@ -136,7 +131,7 @@ public class ExpenseCliMethod {
     }
     public void FindCategory(){
         System.out.println("Enter category name");
-        String category = null;
+        String category;
         try {
             category = br.readLine();
         } catch (IOException e) {
@@ -223,24 +218,23 @@ public class ExpenseCliMethod {
         BigDecimal bigDecimal = service.averageOfExpensesInRangeOfTime(dataFrom, dataTo);
         System.out.println("Average of yours expenses in given time: " + bigDecimal);
     }
-    public void WriterCsv(){
-        ExpenseCsvMapper csvMapper = new ExpenseCsvMapper();
-        ExpenseService service = new ExpenseService();
-        StringWriter writer = new StringWriter();
-        Set<Expense> expenses = service.getExpenseSet();
-        for (Expense record :expenses) {
-          writer  = new StringWriter();
-          writer.write(record.toString());
-          writer.flush();
-
-        }
-        try {
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    public void loadData(String fileName, FileType fileType) throws IOException, InvalidExpenseException {
+ //   public void WriterCsv(){
+ //       ExpenseService service = new ExpenseService();
+ //       StringWriter writer = new StringWriter();
+ //       Set<Expense> expenses = service.getExpenseSet();
+ //       for (Expense record :expenses) {
+ //         writer  = new StringWriter();
+ //         writer.write(record.toString());
+ //         writer.flush();
+//
+ //       }
+ //       try {
+ //           writer.close();
+ //       } catch (IOException e) {
+ //           e.printStackTrace();
+ //       }
+ //   }
+    public void loadData(String fileName, FileType fileType) throws  InvalidExpenseException {
         System.out.println("Loading data from " + fileName);
 
         Set<Expense> expenses;
@@ -255,7 +249,7 @@ public class ExpenseCliMethod {
         expenses.forEach(service::addExpense);
         System.out.println("Successfully loaded " + expenses);
     }
-    public void writeData(String fileName, FileType fileType) throws IOException, InvalidExpenseException {
+    public void writeData(String fileName, FileType fileType) {
         System.out.println("Saving data to " + fileName);
 
        Set<Expense> expenses = service.getExpenseSet();
@@ -271,8 +265,6 @@ public class ExpenseCliMethod {
         System.out.println("Successfully saved " + expenses.size() + " expenses.");
 
     }
-    public void cleanData(String fileName, FileType fileType){
 
-    }
 
 }

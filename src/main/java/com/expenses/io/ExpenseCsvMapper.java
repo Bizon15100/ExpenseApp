@@ -2,8 +2,6 @@ package com.expenses.io;
 
 import com.expenses.Expense;
 import com.expenses.InvalidExpenseException;
-import com.expenses.io.ExpenseMapper;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;

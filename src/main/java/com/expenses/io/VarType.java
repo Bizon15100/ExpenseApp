@@ -12,4 +12,8 @@ public enum VarType {
     VarType(String type){
         this.type = type;
     }
+
+    public String getType() {
+        return type;
+    }
 }
