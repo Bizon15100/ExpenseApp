@@ -103,20 +103,23 @@ public class ExpenseService implements Comparator<Expense>{
 
         if (type.equals(VarType.AMOUNT)) {
           expenses.stream()
-                  .sorted( comparing(Expense::getAmount))
+                  .sorted(ascOrDesc.equals("asc") ? comparing(Expense::getAmount) : comparing(Expense::getAmount).reversed())
                   .collect(Collectors.toSet());
       }
         if (type.equals(VarType.PLACE)) {
             expenses.stream()
-                    .sorted(ascOrDesc.equals("asc") ? comparing(Expense::getPlace) : comparing(Expense::getPlace).reversed()).collect(Collectors.toSet());
+                    .sorted(ascOrDesc.equals("asc") ? comparing(Expense::getPlace) : comparing(Expense::getPlace).reversed())
+                    .collect(Collectors.toSet());
         }
         if (type.equals(VarType.DATE)) {
             expenses.stream()
-                    .sorted(ascOrDesc.equals("asc") ? comparing(Expense::getDate) : comparing(Expense::getDate).reversed()).collect(Collectors.toSet());
+                    .sorted(ascOrDesc.equals("asc") ? comparing(Expense::getDate) : comparing(Expense::getDate).reversed())
+                    .collect(Collectors.toSet());
         }
         if (type.equals(VarType.CATEGORY)) {
             expenses.stream()
-                    .sorted(ascOrDesc.equals("asc") ? comparing(Expense::getCategory) : comparing(Expense::getCategory).reversed()).collect(Collectors.toSet());
+                    .sorted(ascOrDesc.equals("asc") ? comparing(Expense::getCategory) : comparing(Expense::getCategory).reversed())
+                    .collect(Collectors.toSet());
         }
         return expenses;
     }
