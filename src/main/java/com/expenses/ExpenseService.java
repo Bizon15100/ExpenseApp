@@ -99,29 +99,39 @@ public class ExpenseService implements Comparator<Expense>{
         return result;
     }
 
-    public Set<Expense> sortByObject(VarType type, String ascOrDesc) {
-
-        if (type.equals(VarType.AMOUNT)) {
-          expenses.stream()
-                  .sorted(ascOrDesc.equals("asc") ? comparing(Expense::getAmount) : comparing(Expense::getAmount).reversed())
-                  .collect(Collectors.toSet());
-      }
+    public Set<Expense> sortByObject( VarType type, String ascOrDesc) {
+        Set<Expense> expenseSet = getExpenseSet();
+      //  if (type.equals(VarType.AMOUNT)) {
+      //      Set<Expense> expensesAmount = expenses.stream()
+      //              .sorted(ascOrDesc.equals("asc") ? comparing(Expense::getAmount) : comparing(Expense::getAmount).reversed())
+      //              .collect(Collectors.toSet());
+      //      expenseSet = expensesAmount;
+      //  }
         if (type.equals(VarType.PLACE)) {
-            expenses.stream()
+            Set<Expense> expensePlace = expenses.stream()
                     .sorted(ascOrDesc.equals("asc") ? comparing(Expense::getPlace) : comparing(Expense::getPlace).reversed())
                     .collect(Collectors.toSet());
+            expenseSet = expensePlace;
         }
         if (type.equals(VarType.DATE)) {
-            expenses.stream()
+            Set<Expense> expenseDate = expenses.stream()
                     .sorted(ascOrDesc.equals("asc") ? comparing(Expense::getDate) : comparing(Expense::getDate).reversed())
                     .collect(Collectors.toSet());
+            expenseSet = expenseDate;
         }
         if (type.equals(VarType.CATEGORY)) {
-            expenses.stream()
+            Set<Expense> expenseCategory = expenses.stream()
                     .sorted(ascOrDesc.equals("asc") ? comparing(Expense::getCategory) : comparing(Expense::getCategory).reversed())
                     .collect(Collectors.toSet());
+            expenseSet = expenseCategory;
         }
-        return expenses;
+        if (type.equals(VarType.AMOUNT)){
+            Set<Expense> expensesAmount = expenses.stream()
+                    .sorted(ascOrDesc.equals("asc") ? comparing(Expense::getAmount) : comparing(Expense::getAmount).reversed())
+                    .collect(Collectors.toSet());
+            expenseSet = expensesAmount;
+        }
+        return expenseSet;
     }
 
 

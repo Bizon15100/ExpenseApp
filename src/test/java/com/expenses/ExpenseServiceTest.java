@@ -1,5 +1,6 @@
 package com.expenses;
 
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -8,7 +9,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.*;
-
 import static com.expenses.Expense.builder;
 import static com.expenses.io.VarType.*;
 import static java.math.BigDecimal.*;
@@ -434,16 +434,18 @@ class ExpenseServiceTest {
         service.addExpense(expense4);
         service.addExpense(expense5);
 
+        Set<Expense> expenseSet = service.getExpenseSet();
+
         service.getExpenseSet()
                 .stream()
-                .sorted(Comparator.comparing(Expense::getDate).reversed())
+                .sorted(Comparator.comparing(Expense::getAmount).reversed())
                 .forEach(System.out::println);
-       // financesService.getExpenseSet().stream().sorted(Comparator.comparing(Expense::getAmount)).forEach(System.out::println);
 
-      //  financesService.getExpenseSet().forEach(System.out::println);
         System.out.println();
-        service.sortByObject(DATE, "asc").forEach(System.out::println);
-                //.stream().sorted(Comparator.comparing(Expense::getAmount)).forEach(System.out::println);
+
+        service.sortByObject(AMOUNT, "asc").forEach(System.out::println);
+
+
     }
 
 

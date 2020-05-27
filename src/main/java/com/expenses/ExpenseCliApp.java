@@ -16,7 +16,7 @@ public class ExpenseCliApp {
         ExpenseService service = new ExpenseService();
 
         System.out.println("Welcome in my app.");
-        method.loadData("/data.json",FileType.JSON);
+    //    method.loadData("/data.json",FileType.JSON);
         while (true) {
             method.menu();
             System.out.println("Insert command");
@@ -72,17 +72,14 @@ public class ExpenseCliApp {
                     break;
                 }
                 case "x": {
-                   method.writeData("./data.json", FileType.JSON);
+                   method.writeData("./data.csv", FileType.CSV);
                     System.out.println("Application closed");
-                    System.exit(1);
+                    System.exit(0);
                 }
                 default:
                     System.out.println("Unknown command");
             }
         }
-
-
-
 
     }
 }
