@@ -18,7 +18,4 @@ public enum VarType {
         return type;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
 }

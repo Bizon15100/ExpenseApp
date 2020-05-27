@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class ExpenseCliApp {
 
-    public static void main(String[] args) throws InvalidExpenseException, IOException {
+    public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         ExpenseCliMethod method = new ExpenseCliMethod();
         ExpenseService service = new ExpenseService();
