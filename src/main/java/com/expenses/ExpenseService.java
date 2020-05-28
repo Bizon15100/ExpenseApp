@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.expenses.io.VarType.*;
@@ -102,32 +103,27 @@ public class ExpenseService implements Comparator<Expense>{
 
     public Set<Expense> sortByObject( VarType type, String ascOrDesc) {
         Set<Expense> expenseSet = new HashSet<>();
-      //  if (type.equals(VarType.AMOUNT)) {
-      //      Set<Expense> expensesAmount = expenses.stream()
-      //              .sorted(ascOrDesc.equals("asc") ? comparing(Expense::getAmount) : comparing(Expense::getAmount).reversed())
-      //              .collect(Collectors.toSet());
-      //      expenseSet = expensesAmount;
-      //  }
         if (type.equals(PLACE)) {
             expenseSet = expenses.stream()
                     .sorted(ascOrDesc.equals("asc") ? comparing(Expense::getPlace) : comparing(Expense::getPlace).reversed())
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
         }
         if (type.equals(DATE)) {
             Set<Expense> expenseDate = expenses.stream()
                     .sorted(ascOrDesc.equals("asc") ? comparing(Expense::getDate) : comparing(Expense::getDate).reversed())
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
             expenseSet = expenseDate;
         }
         if (type.equals(CATEGORY)) {
             expenseSet = expenses.stream()
                     .sorted(ascOrDesc.equals("asc") ? comparing(Expense::getCategory) : comparing(Expense::getCategory).reversed())
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
         }
-        if (type.name() == "AMOUNT"){
+        if (type.equals(AMOUNT)){
             expenseSet = expenses.stream()
                     .sorted(ascOrDesc.equals("asc") ? comparing(Expense::getAmount) : comparing(Expense::getAmount).reversed())
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+
         }
         return expenseSet;
     }

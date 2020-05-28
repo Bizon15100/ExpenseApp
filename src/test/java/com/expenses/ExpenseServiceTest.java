@@ -10,6 +10,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import static com.expenses.Expense.builder;
 import static com.expenses.io.VarType.*;
 import static java.math.BigDecimal.*;
@@ -395,8 +398,8 @@ class ExpenseServiceTest {
     }
 
     @Test
-    void smallTest() throws InvalidExpenseException {
-
+    void shouldTestSortByObjectMethod() throws InvalidExpenseException {
+        //given
         Expense expense1 = builder()
                 .amount(valueOf(10.0))
                 .date(LocalDate.now())
@@ -434,17 +437,19 @@ class ExpenseServiceTest {
         service.addExpense(expense3);
         service.addExpense(expense4);
         service.addExpense(expense5);
-
-        Set<Expense> expenseSet = service.getExpenseSet();
-
-        service.getExpenseSet()
+        //when
+        List<Expense> expectedList = service.getExpenseSet()
                 .stream()
-                .sorted(Comparator.comparing(Expense::getAmount).reversed())
-                .forEach(System.out::println);
+                .sorted(Comparator.comparing(Expense::getAmount))
+                .collect(Collectors.toList());
+        //then
+        List<Expense> resultList = new ArrayList<>(service.sortByObject(AMOUNT, "asc"));
 
-        System.out.println();
-
-        service.sortByObject(AMOUNT, "asc").forEach(System.out::println);
+        assertEquals(expectedList.get(0), resultList.get(0));
+        assertEquals(expectedList.get(1), resultList.get(1));
+        assertEquals(expectedList.get(2), resultList.get(2));
+        assertEquals(expectedList.get(3), resultList.get(3));
+        assertEquals(expectedList.get(4), resultList.get(4));
 
 
     }
