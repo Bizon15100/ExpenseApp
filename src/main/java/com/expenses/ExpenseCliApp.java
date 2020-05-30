@@ -10,13 +10,14 @@ import java.util.Map;
 
 public class ExpenseCliApp {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InvalidExpenseException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         ExpenseCliMethod method = new ExpenseCliMethod();
         ExpenseService service = new ExpenseService();
 
         System.out.println("Welcome in my app.");
-    //    method.loadData("/data.json",FileType.JSON);
+
+        method.loadData("/data.json",FileType.JSON);
         while (true) {
             method.menu();
             System.out.println("Insert command");
@@ -68,11 +69,11 @@ public class ExpenseCliApp {
                     break;
                 }
                 case "save": {
-                    method.writeData("/data.csv", FileType.CSV);
+                    method.writeData("/data.json", FileType.JSON);
                     break;
                 }
                 case "x": {
-                   method.writeData("./data.csv", FileType.CSV);
+                   method.writeData("/data.json", FileType.JSON);
                     System.out.println("Application closed");
                     System.exit(0);
                 }
