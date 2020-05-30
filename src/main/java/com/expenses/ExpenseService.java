@@ -6,7 +6,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.expenses.io.VarType.*;
@@ -163,6 +162,10 @@ public class ExpenseService implements Comparator<Expense>{
         return map;
     }
 
+
+
+
+
     public String toString() {
         StringBuilder message = new StringBuilder("Expenses:\n");
 
@@ -180,4 +183,5 @@ public class ExpenseService implements Comparator<Expense>{
         }
         return 0;
     }
+
 }

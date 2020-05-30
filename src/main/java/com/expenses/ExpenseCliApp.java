@@ -1,11 +1,11 @@
 package com.expenses;
 
-import com.expenses.io.FileType;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.Scanner;
+
+
 
 
 public class ExpenseCliApp {
@@ -17,7 +17,15 @@ public class ExpenseCliApp {
 
         System.out.println("Welcome in my app.");
 
-        method.loadData("/data.json",FileType.JSON);
+        System.out.println("Enter file name - format 'name.json or name.csv' ");
+        Scanner scanner = new Scanner(System.in);
+        String fileName = scanner.nextLine();
+
+        if (!new File(fileName).exists()) {
+             new FileWriter(fileName);
+            System.out.println("New file created");
+        }else method.load(fileName);
+
         while (true) {
             method.menu();
             System.out.println("Insert command");
@@ -69,11 +77,11 @@ public class ExpenseCliApp {
                     break;
                 }
                 case "save": {
-                    method.writeData("/data.json", FileType.JSON);
+                    method.save(fileName);
                     break;
                 }
                 case "x": {
-                   method.writeData("/data.json", FileType.JSON);
+                   method.save(fileName);
                     System.out.println("Application closed");
                     System.exit(0);
                 }

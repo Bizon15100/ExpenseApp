@@ -218,22 +218,7 @@ public class ExpenseCliMethod {
         BigDecimal bigDecimal = service.averageOfExpensesInRangeOfTime(dataFrom, dataTo);
         System.out.println("Average of yours expenses in given time: " + bigDecimal);
     }
- //   public void WriterCsv(){
- //       ExpenseService service = new ExpenseService();
- //       StringWriter writer = new StringWriter();
- //       Set<Expense> expenses = service.getExpenseSet();
- //       for (Expense record :expenses) {
- //         writer  = new StringWriter();
- //         writer.write(record.toString());
- //         writer.flush();
-//
- //       }
- //       try {
- //           writer.close();
- //       } catch (IOException e) {
- //           e.printStackTrace();
- //       }
- //   }
+
     public void loadData(String fileName, FileType fileType) throws  InvalidExpenseException {
         System.out.println("Loading data from " + fileName);
 
@@ -265,6 +250,32 @@ public class ExpenseCliMethod {
         System.out.println("Successfully saved " + expenses.size() + " expenses.");
 
     }
+    public void load(String fileName) throws InvalidExpenseException {
+            String[] split = fileName.split("\\.");
 
+            if (split.length == 2) {
+                String extension = split[1];
+                if (extension.equals("csv")) {
+                    loadData(fileName, FileType.CSV);
+                } else if (extension.equals("json")) {
+                    loadData(fileName, FileType.JSON);
+                } else System.out.println("Unknown extension");
+            } else System.out.println("Invalid file name format");
+
+    }
+    public void save(String fileName){
+        String[] split = fileName.split("\\.");
+
+        if (split.length==2){
+            String extension = split[1];
+            if (extension.equals("csv")){
+                writeData(fileName,FileType.CSV);
+            }
+            if (extension.equals("json")){
+                writeData(fileName,FileType.JSON);
+            }
+        }
+
+    }
 
 }
