@@ -21,11 +21,7 @@ public class ExpenseCliApp {
         Scanner scanner = new Scanner(System.in);
         String fileName = scanner.nextLine();
 
-        if (!new File(fileName).exists()) {
-             new FileWriter(fileName);
-            System.out.println("New file created");
-        }else method.load(fileName);
-
+        method.load(fileName);
         while (true) {
             method.menu();
             System.out.println("Insert command");

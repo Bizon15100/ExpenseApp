@@ -250,7 +250,8 @@ public class ExpenseCliMethod {
         System.out.println("Successfully saved " + expenses.size() + " expenses.");
 
     }
-    public void load(String fileName) throws InvalidExpenseException {
+    public void load(String fileName) throws InvalidExpenseException, IOException {
+
             String[] split = fileName.split("\\.");
 
             if (split.length == 2) {
@@ -259,6 +260,13 @@ public class ExpenseCliMethod {
                     loadData(fileName, FileType.CSV);
                 } else if (extension.equals("json")) {
                     loadData(fileName, FileType.JSON);
+                    File file = new File(fileName);
+                    if (file.createNewFile()) {
+                        FileWriter fileWriter = new FileWriter(file);
+                        fileWriter.write("[]");
+                        System.out.println("New file created");
+                    } else System.out.println(fileName + " exists.");
+
                 } else System.out.println("Unknown extension");
             } else System.out.println("Invalid file name format");
 

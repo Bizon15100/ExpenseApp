@@ -14,7 +14,9 @@ import java.io.Writer;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Set;
 
 @SuppressWarnings("unchecked")
 public class ExpenseJsonMapper implements ExpenseMapper {
@@ -22,42 +24,59 @@ public class ExpenseJsonMapper implements ExpenseMapper {
     public Set<Expense> read(Reader reader) {
         JSONParser parser = new JSONParser();
         Set<Expense> expenses = new HashSet<>();
+
         try {
           Object obj = parser.parse(reader);
           JSONArray expenseList = (JSONArray) obj;
-          expenseList.forEach(exp -> {
-              try {
-                  Expense expense = parseExpensesObject((JSONObject) exp);
-                  expenses.add(expense);
-              } catch (InvalidExpenseException e) {
-                  e.printStackTrace();
-              }
-          });
+          Expense expense;
+            for (Object exp:expenseList) {
+                try {
+                    expense = parseExpensesObject((JSONObject) exp);
+                    expenses.add(expense);
+                } catch (InvalidExpenseException e) {
+                    e.printStackTrace();
+                }
+
+            }
         } catch (ParseException | IOException e){
             e.printStackTrace();
         }
+
         return expenses;
     }
 
     @Override
-    public void write(@NotNull Set<Expense> expenses, Writer writer) throws IOException {
+    public void write(Set<Expense> expenses, Writer writer) throws IOException {
         JSONObject object = new JSONObject();
         JSONObject jsonExpense = new JSONObject();
-        for (Expense expense:expenses) {
-            object.put("amount",expense.getAmount().toString());
-            object.put("date",expense.getDate().toString());
-            object.put("place",expense.getPlace());
-            object.put("category", expense.getCategory());
-            jsonExpense.put("expense",object);
+        JSONArray expenseJsonList= new JSONArray();
+        LinkedList<Expense> expenseList = new LinkedList<>(expenses);
+        writer.append("[");
+
+        for (int i = 0; i < expenseList.size() -1; i++) {
+                object.put("amount",expenseList.get(i).getAmount().toString());
+                object.put("date",expenseList.get(i).getDate().toString());
+                object.put("place",expenseList.get(i).getPlace());
+                object.put("category", expenseList.get(i).getCategory());
+                jsonExpense.put("expense",object);
+                writer.write(jsonExpense.toJSONString());
+                writer.append(",");
         }
-        JSONArray expenseJsonList = new JSONArray();
-        expenseJsonList.add(jsonExpense);
-        writer.write(expenseJsonList.toJSONString());
+        object.put("amount",expenseList.get(expenseList.size()-1).getAmount().toString());
+        object.put("date",expenseList.get(expenseList.size()-1).getDate().toString());
+        object.put("place",expenseList.get(expenseList.size()-1).getPlace());
+        object.put("category", expenseList.get(expenseList.size()-1).getCategory());
+        jsonExpense.put("expense",object);
+        writer.write(jsonExpense.toJSONString());
+        writer.append("]");
+        //expenseJsonList.add(jsonExpense);
+        //writer.write(expenseJsonList.toJSONString());
+
     }
 
     @NotNull
-    private static Expense parseExpensesObject(JSONObject jsonArray) throws InvalidExpenseException {
-        JSONObject expense = (JSONObject) jsonArray.get("expense");
+    private static Expense parseExpensesObject(JSONObject jsonObject) throws InvalidExpenseException {
+        JSONObject expense = (JSONObject) jsonObject.get("expense");
         String amount1 = (String) expense.get("amount");
         BigDecimal amount = BigDecimal.valueOf(Double.parseDouble(amount1));
 
