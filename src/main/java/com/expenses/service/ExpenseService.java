@@ -1,6 +1,13 @@
-package com.expenses;
+package com.expenses.service;
 
+import com.expenses.Object.Expense;
+import com.expenses.ExpenseInRangeOfTime;
+import com.expenses.InvalidExpenseException;
+import com.expenses.Logger;
+import com.expenses.Object.ExpensePrev;
 import com.expenses.io.VarType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -13,29 +20,31 @@ import static java.math.BigDecimal.ZERO;
 import static java.math.BigDecimal.valueOf;
 import static java.util.Comparator.comparing;
 
-@SuppressWarnings("ALL")
-public class ExpenseService implements Comparator<Expense>{
-    private Set<Expense> expenses = new HashSet<>();
+@Service
+public class ExpenseService implements Comparator<Expense> {
+    private final Set<Expense> expenses = new HashSet<>();
 
-    public void addExpense(Expense expense) {
-        expenses.add(expense);
+    @Autowired
+    Logger logger;
+
+    public Expense addExpense(ExpensePrev expense) throws InvalidExpenseException {
+        Expense expense1 = ExpensePrev.expensePrev(expense);
+        expenses.add(expense1);
+        logger.logInfo("Added expense -> " + expense);
+        return expense1;
     }
 
     public Set<Expense> getExpenseSet() {
         return new HashSet<>(expenses);
     }
 
-    public Set<Expense> findExpensesInRange(LocalDate from, LocalDate to) {
-        ExpenseInRangeOfTime expenseInRangeOfTime = new ExpenseInRangeOfTime(from, to);
+    public Set<Expense> findExpensesInRange(String from, String to) {
+        LocalDate fromDate = LocalDate.parse(from);
+        LocalDate toDate = LocalDate.parse(to);
+        ExpenseInRangeOfTime expenseInRangeOfTime = new ExpenseInRangeOfTime(fromDate, toDate);
         Set<Expense> expensesInRange = expenses.stream()
                 .filter(expenseInRangeOfTime)
-                .collect(Collectors.toSet());       // praca domowa
-
-        //   for (Expense expense : expenses) {
-        //       if (!expense.getDate().isBefore(from) & !expense.getDate().isAfter(to)){
-        //           expensesInRange.add(expense);
-        //       }
-        //   }
+                .collect(Collectors.toSet());
         return expensesInRange;
     }
 
@@ -74,13 +83,13 @@ public class ExpenseService implements Comparator<Expense>{
         return expensesInOneCategory;
     }
 
-    public BigDecimal averageOfExpensesInRangeOfTime(LocalDate from, LocalDate to) {
+    public BigDecimal averageOfExpensesInRangeOfTime(String from, String to) {
         Set<Expense> expensesInRange = findExpensesInRange(from, to);
         BigDecimal sum = ZERO;
         for (Expense expense : expensesInRange) {
             sum = expense.getAmount().add(sum);
         }
-        if (expensesInRange.size() != 0 | !expensesInRange.isEmpty()) {
+        if (!expensesInRange.isEmpty()) {
             return sum.divide(valueOf(expensesInRange.size()));
             //+ sum%expensesInRange.size();
         } else return ZERO;
@@ -88,19 +97,18 @@ public class ExpenseService implements Comparator<Expense>{
 
     public BigDecimal theBiggestExpenseInGivenCategory(String category) {
         Set<Expense> expensesInCategory = expensesInOneCategory(category);
-        BigDecimal result = ZERO;
 
         List<Expense> expenseList = expensesInCategory
                 .stream()
                 .sorted(comparing(Expense::getAmount))
                 .collect(Collectors.toList());
 
-        result = expenseList.get(expenseList.size() - 1).getAmount();
+        BigDecimal result = expenseList.get(expenseList.size() - 1).getAmount();
 
         return result;
     }
 
-    public Set<Expense> sortByObject( VarType type, String ascOrDesc) {
+    public Set<Expense> sortByObject(VarType type, String ascOrDesc) {
         Set<Expense> expenseSet = new HashSet<>();
         if (type.equals(PLACE)) {
             expenseSet = expenses.stream()
@@ -118,7 +126,7 @@ public class ExpenseService implements Comparator<Expense>{
                     .sorted(ascOrDesc.equals("asc") ? comparing(Expense::getCategory) : comparing(Expense::getCategory).reversed())
                     .collect(Collectors.toCollection(LinkedHashSet::new));
         }
-        if (type.equals(AMOUNT)){
+        if (type.equals(AMOUNT)) {
             expenseSet = expenses.stream()
                     .sorted(ascOrDesc.equals("asc") ? comparing(Expense::getAmount) : comparing(Expense::getAmount).reversed())
                     .collect(Collectors.toCollection(LinkedHashSet::new));
@@ -163,9 +171,6 @@ public class ExpenseService implements Comparator<Expense>{
     }
 
 
-
-
-
     public String toString() {
         StringBuilder message = new StringBuilder("Expenses:\n");
 
@@ -178,10 +183,9 @@ public class ExpenseService implements Comparator<Expense>{
 
     @Override
     public int compare(Expense o1, Expense o2) {
-        if (o1.equals(o2)){
+        if (o1.equals(o2)) {
             return 1;
         }
         return 0;
     }
-
 }

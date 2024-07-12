@@ -1,5 +1,9 @@
 package com.expenses;
 
+import com.expenses.service.ExpenseService;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 import java.io.*;
 import java.math.BigDecimal;
 import java.util.Map;
@@ -7,10 +11,13 @@ import java.util.Scanner;
 
 
 
-
+@SpringBootApplication
 public class ExpenseCliApp {
+    public static void main(String[] args) {
+        SpringApplication.run(ExpenseCliApp.class, args);
+    }
 
-    public static void main(String[] args) throws IOException, InvalidExpenseException {
+   /* public static void main(String[] args) throws IOException, InvalidExpenseException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         ExpenseCliMethod method = new ExpenseCliMethod();
         ExpenseService service = new ExpenseService();
@@ -85,6 +92,5 @@ public class ExpenseCliApp {
                     System.out.println("Unknown command");
             }
         }
-
-    }
+    }*/
 }

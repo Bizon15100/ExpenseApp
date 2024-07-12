@@ -1,6 +1,6 @@
 package com.expenses.io;
 
-import com.expenses.Expense;
+import com.expenses.Object.Expense;
 import com.expenses.InvalidExpenseException;
 
 import java.io.FileReader;

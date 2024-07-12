@@ -1,6 +1,6 @@
 package com.expenses.io;
 
-import com.expenses.Expense;
+import com.expenses.Object.Expense;
 import com.expenses.InvalidExpenseException;
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
@@ -18,7 +18,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
-@SuppressWarnings("unchecked")
 public class ExpenseJsonMapper implements ExpenseMapper {
     @Override
     public Set<Expense> read(Reader reader) {
@@ -49,7 +48,6 @@ public class ExpenseJsonMapper implements ExpenseMapper {
     public void write(Set<Expense> expenses, Writer writer) throws IOException {
         JSONObject object = new JSONObject();
         JSONObject jsonExpense = new JSONObject();
-        JSONArray expenseJsonList= new JSONArray();
         LinkedList<Expense> expenseList = new LinkedList<>(expenses);
         writer.append("[");
 

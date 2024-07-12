@@ -1,33 +1,18 @@
-package com.expenses;
+package com.expenses.Object;
+
+import com.expenses.InvalidExpenseException;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
-
-public class  Expense {
+@Getter
+public class Expense {
     private BigDecimal amount;
     private LocalDate date;
     private String place;
     private String category;
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public String getPlace() {
-        return place;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
 
 
     public static final class Builder {
@@ -64,7 +49,7 @@ public class  Expense {
             if (date == null || date.isAfter(LocalDate.now())) {
                 throw new InvalidExpenseException("You have to write a past date.");
             }
-            if (place.isBlank() && place==null) {
+            if (place.isBlank()) {
                 throw new InvalidExpenseException("You have to write a place of expense.");
             }
 
@@ -103,7 +88,7 @@ public class  Expense {
         if (!s.contains(".")){
             return true;
         } else if (split.length <= 2) {
-            return split[1].length() == 2 | split[1].length() == 1 | split[1].length() == 0;
+            return split[1].length() == 2 | split[1].length() == 1 | split[1].isEmpty();
         } else return false;
 
     }
@@ -112,14 +97,14 @@ public class  Expense {
         return new Builder();
     }
 
-    @Override
+    /*@Override
     public String toString() {
         DateTimeFormatter dateFormat = DateTimeFormatter
                 .ofPattern("dd-MM-yyyy");
         String message = "{%s, %s, %s, %s}";
 
         return String.format(message,amount, date.format(dateFormat),  place, category);
-    }
+    }*/
 
 }
 
