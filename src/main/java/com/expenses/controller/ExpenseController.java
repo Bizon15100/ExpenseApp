@@ -2,6 +2,7 @@ package com.expenses.controller;
 
 import com.expenses.Object.Expense;
 import com.expenses.Object.ExpensePrev;
+import com.expenses.io.SortType;
 import com.expenses.service.ExpenseCliMethod;
 import com.expenses.InvalidExpenseException;
 import com.expenses.io.VarType;
@@ -28,8 +29,8 @@ public class ExpenseController {
     }
 
     @RequestMapping(method = RequestMethod.GET, path = "/all/sorted")
-    public ResponseEntity<Set<Expense>> getExpenseSortedBy(VarType type, String ascOrDesc) {
-        return ResponseEntity.of(Optional.ofNullable(services.sortByObject(type, ascOrDesc)));
+    public ResponseEntity<Set<Expense>> getExpenseSortedBy(@RequestBody VarType type, @RequestBody SortType ascOrDesc) {
+        return ResponseEntity.of(Optional.ofNullable(services.sortByObject(type, ascOrDesc.getType())));
     }
 
     @RequestMapping(method = RequestMethod.POST, path = "/add")
