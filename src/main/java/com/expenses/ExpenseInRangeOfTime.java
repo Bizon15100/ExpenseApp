@@ -3,6 +3,7 @@ package com.expenses;
 import com.expenses.Object.Expense;
 
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.function.Predicate;
 
 public class ExpenseInRangeOfTime implements Predicate<Expense>  {

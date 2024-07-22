@@ -1,25 +1,35 @@
 package com.expenses.Object;
 
 import com.expenses.InvalidExpenseException;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.util.Date;
 import java.util.Objects;
 
 @Getter
 public class Expense {
+    @JsonProperty
     private BigDecimal amount;
-    private LocalDate date;
-    private String place;
+    @JsonProperty
     private String category;
+    @JsonProperty
+    private String place;
+    @JsonProperty()
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate date;
 
 
     public static final class Builder {
         private BigDecimal amount;
-        private LocalDate date;
-        private String place;
         private String category;
+        private String place;
+        @DateTimeFormat(pattern = "yyyy-MM-dd")
+        private LocalDate date;
 
         public Builder amount(BigDecimal amount) {
             this.amount = amount;
@@ -42,7 +52,6 @@ public class Expense {
         }
 
         public Expense build() throws InvalidExpenseException {
-
             if (amount.compareTo(BigDecimal.ZERO) < 0) {
                 throw new InvalidExpenseException("Amount should be grater than 0.");
             }
@@ -52,19 +61,19 @@ public class Expense {
             if (place.isBlank()) {
                 throw new InvalidExpenseException("You have to write a place of expense.");
             }
-
             if (!checkPrecisionOfDouble(String.valueOf(amount))) {
                 throw new InvalidExpenseException("0.00");
             }
             Expense expense = new Expense();
             expense.amount = this.amount;
-            expense.date = this.date;
-            expense.place = this.place;
             expense.category = this.category;
+            expense.place = this.place;
+            expense.date = this.date;
             return expense;
         }
 
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -85,7 +94,7 @@ public class Expense {
     static boolean checkPrecisionOfDouble(String attribute) {
         String s = String.valueOf(attribute);
         String[] split = s.split("\\.");
-        if (!s.contains(".")){
+        if (!s.contains(".")) {
             return true;
         } else if (split.length <= 2) {
             return split[1].length() == 2 | split[1].length() == 1 | split[1].isEmpty();
@@ -93,25 +102,7 @@ public class Expense {
 
     }
 
-    public static Builder builder(){
+    public static Builder builder() {
         return new Builder();
     }
-
-    /*@Override
-    public String toString() {
-        DateTimeFormatter dateFormat = DateTimeFormatter
-                .ofPattern("dd-MM-yyyy");
-        String message = "{%s, %s, %s, %s}";
-
-        return String.format(message,amount, date.format(dateFormat),  place, category);
-    }*/
-
 }
-
-//for (Expense expense : expenses) {
-//        message.append("|Amount|: ").append(expense.getAmount()).append(" ")
-//        .append("|Date|: ").append(expense.getDate()).append(" ")
-//        .append("|Place|: ").append(expense.getPlace()).append(" ")
-//        .append("|Category|: ").append(expense.getCategory()).append(" ")
-//        .append("\n");
-//        }

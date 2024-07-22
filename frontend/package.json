@@ -10,6 +10,8 @@
     "vue": "^2.6.7",
     "vue-router": "^3.0.2",
     "vue-meta": "^2.2.1",
+    "axios": "^1.7.2",
+    "cors": "^2.8.5",
     "@lottiefiles/vue-lottie-player": "1.0.4",
     "dangerous-html": "0.1.13"
   },

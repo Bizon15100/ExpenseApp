@@ -4,18 +4,18 @@ import com.expenses.Object.Expense;
 import com.expenses.ExpenseInRangeOfTime;
 import com.expenses.InvalidExpenseException;
 import com.expenses.Logger;
-import com.expenses.Object.ExpensePrev;
-import com.expenses.io.VarType;
+import com.expenses.type.VarType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.expenses.io.VarType.*;
+import static com.expenses.type.VarType.*;
 import static java.math.BigDecimal.ZERO;
 import static java.math.BigDecimal.valueOf;
 import static java.util.Comparator.comparing;
@@ -27,11 +27,10 @@ public class ExpenseService implements Comparator<Expense> {
     @Autowired
     Logger logger;
 
-    public Expense addExpense(ExpensePrev expense) throws InvalidExpenseException {
-        Expense expense1 = ExpensePrev.expensePrev(expense);
-        expenses.add(expense1);
+    public Expense addExpense(Expense expense) {
+        expenses.add(expense);
         logger.logInfo("Added expense -> " + expense);
-        return expense1;
+        return expense;
     }
 
     public Set<Expense> getExpenseSet() {

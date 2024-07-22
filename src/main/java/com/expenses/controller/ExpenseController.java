@@ -1,12 +1,14 @@
 package com.expenses.controller;
 
 import com.expenses.Object.Expense;
-import com.expenses.Object.ExpensePrev;
-import com.expenses.io.SortType;
-import com.expenses.service.ExpenseCliMethod;
+import com.expenses.type.SortType;
 import com.expenses.InvalidExpenseException;
-import com.expenses.io.VarType;
+import com.expenses.type.VarType;
 import com.expenses.service.ExpenseService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +18,6 @@ import java.util.Set;
 
 @RestController
 public class ExpenseController {
-
-    @Autowired
-    ExpenseCliMethod methods = new ExpenseCliMethod();
 
     @Autowired
     ExpenseService services = new ExpenseService();
@@ -33,8 +32,13 @@ public class ExpenseController {
         return ResponseEntity.of(Optional.ofNullable(services.sortByObject(type, ascOrDesc.getType())));
     }
 
+    @CrossOrigin(origins = "*")
     @RequestMapping(method = RequestMethod.POST, path = "/add")
-    public ResponseEntity<Expense> addExpense(@RequestBody ExpensePrev expense) throws InvalidExpenseException {
+    public ResponseEntity<Expense> addExpense(@RequestBody String stringExpense) throws InvalidExpenseException, JsonProcessingException {
+        ObjectMapper objectMapper = JsonMapper.builder()
+                .addModule(new JavaTimeModule())
+                .build();
+        Expense expense = objectMapper.readValue(stringExpense, Expense.class);
         Expense paredExpense = services.addExpense(expense);
         return ResponseEntity.of(Optional.of(paredExpense));
     }
